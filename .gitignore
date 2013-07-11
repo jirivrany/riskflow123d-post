@@ -1,0 +1,6 @@
+*pyc
+*.pyc
+*profile
+.project
+.pydevproject
+riskFlow123d.ini
