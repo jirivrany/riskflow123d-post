@@ -508,12 +508,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         msg = ''
         try:    
-            self.result_elements = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_ELEMS)
+            self.result_elements = transport.load_vysledek(str(self.master_work_dir) + SEPAR + FNAME_ELEMS)
         except IOError:
             msg += 'Failed to load result data for elements.'
             self.result_elements = None
         try:          
-            self.result_times = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_TIME)
+            self.result_times = transport.load_vysledek(str(self.master_work_dir) + SEPAR + FNAME_TIME)
         except IOError:
             msg += 'Failed to load result data for times.'
             self.result_times = None
