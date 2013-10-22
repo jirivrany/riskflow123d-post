@@ -17,7 +17,7 @@ import sys
 FNAME_TIME = 'times'
 FNAME_ELEMS = 'elements_concentration'
 FNAME_SUMA = 'conc_suma'
-FNAME_EXT = {'json':'js', 'pickle':'pck'}
+FNAME_EXT = {'json':'json', 'pickle':'pck'}
 
 def worker(input_queue, done_queue):
     '''
@@ -158,7 +158,8 @@ def save_vysledek(filename, vysledek, fformat = 'json'):
     save result vysledek to a filename, using file format
     @param: fformat - json, pickle
     '''
-    filename = filename + '.' + FNAME_EXT[fformat]
+    if not filename.endswith(FNAME_EXT[fformat]):
+        filename = filename + '.' + FNAME_EXT[fformat]
     globals()['__save_'+fformat](filename, vysledek)
         
 def __save_json(filename, vysledek):
@@ -191,7 +192,7 @@ def load_vysledek(filename, fformat = 'json'):
     load result vysledek from filename, using file format
     @param: fformat - json, pickle
     '''
-    if not filename.endswith('.js'):
+    if not filename.endswith(FNAME_EXT[fformat]):
         filename = filename + '.' + FNAME_EXT[fformat]
     return globals()['__load_'+fformat](filename)                                        
         
@@ -202,13 +203,9 @@ def __load_pickle(filename):
     :rtype: dict
     '''
     import cPickle
-    try:
-        pars = open(filename, 'rb')
-        vysledek = cPickle.load(pars)
-        return vysledek
-    except IOError:
-        print "failed to read data from %s" % filename
-        return None
+    pars = open(filename, 'rb')
+    vysledek = cPickle.load(pars)
+    return vysledek
     
 def __load_json(filename):
     '''
@@ -217,13 +214,9 @@ def __load_json(filename):
     :rtype: dict
     '''
     import json
-    try:
-        pars = open(filename, 'rb')
-        vysledek = json.load(pars)
-        return vysledek
-    except IOError:
-        print "failed to read data from %s" % filename
-        return None    
+    pars = open(filename, 'rb')
+    vysledek = json.load(pars)
+    return vysledek
         
 
 def dict_to_csv(dct):

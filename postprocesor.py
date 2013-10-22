@@ -111,8 +111,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         #na zacatku neni nic
         self.tabWidget.hide()
-        self.tabWidget.removeTab(1)
-        self.tabWidget.removeTab(1)
+        self.__remove_all_tabs()
+        
+    def __remove_all_tabs(self):
+        '''
+        removes all tabs from the tab widget
+        '''
+        count = self.tabWidget.count() - 1
+        while count >= 1:
+            self.tabWidget.removeTab(count)
+            count -= 1    
         
     def __setup_statusbar(self):
         '''
@@ -178,7 +186,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if len(self.work_dir) <= 2:
             self.work_dir = '../data/test_melechov/MonteCarlo/02'
         self.identify_problem_type()
-        self.tabWidget.setCurrentIndex(2)
         
     def export_compare_conc(self):
         '''
@@ -325,30 +332,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         controlling index of tab widget and throw action
         signal: tabWidget index change
         '''
-        actions = {
-                   'tab_4' : '_data_dialog',
-                   'tab_1' : '_analyser_dialog',
-                   }
-        idx = self.tabWidget.currentWidget().objectName()
-        print idx
-        if actions.has_key(idx):
-            getattr(self, actions[idx])()
+        if not self.tabWidget.isHidden():
+            actions = {
+                       'data_processing' : '_data_dialog',
+                       'basic_analyser' : '_analyser_dialog',
+                       }
+            
+            
+            
+            idx = str(self.tabWidget.currentWidget().objectName())
+            if actions.has_key(idx) and self.problem_type:
+                getattr(self, actions[idx])()
+                
+            if not self.result_elements:
+                self.basic_analyser.setDisabled(True)
+            else:
+                self.basic_analyser.setEnabled(True)    
+            
         
     def _analyser_dialog(self):
         '''
         a dialog for analyser screen
         '''
+    
+        if not self.result_elements:
+            self.read_concentrations()
         
-        ptr = self.tabWidget.currentWidget().objectName()
-        if ptr == 'tab_1':
-            if not self.result_elements:
-                self.read_concentrations()
-            
+        try:
             msg = 'found {} elements with non-zero concentration'.format(len(self.result_elements))    
+        except TypeError:
+            self.messenger('Process data first.')
+        else:
             self.label_basic_1.setText(msg)
-            msg = '{} selected by element selector for drawing'.format(len(self.displayed_mesh_list))
-            self.label_basic_2.setText(msg)
             
+        try:            
+            msg = '{} selected by element selector for drawing'.format(len(self.displayed_mesh_list))
+        except TypeError:
+            self.messenger('Process data first.')
+        else:    
+            self.label_basic_2.setText(msg)
+        
             
     def _data_dialog(self):
         '''
@@ -376,6 +399,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.label_processing_text.setText(msg)
         
         self.progress_processing.setMaximum(n_tas*4)
+        
+        
     
     def _analyze_data(self):
         '''
@@ -480,16 +505,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''read concentration from TransportOut result file'''
         if fname == None:
             fname = self.master_work_dir+SEPAR+self.file_dict['Transport_out']
-            
-        print self.master_work_dir
-        self.result_elements = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_ELEMS)  
-        self.result_times = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_TIME)
-        if not self.result_elements and not self.result_times:
-            self.messenger('Did not find results data, start processing')  
-            self.result_times, self.result_elements =  transport.read_transport(fname)
-            transport.save_vysledek(self.work_dir + SEPAR + FNAME_ELEMS, self.result_elements) 
-            transport.save_vysledek(self.work_dir + SEPAR + FNAME_TIME, self.result_times)    
         
+        msg = ''
+        try:    
+            self.result_elements = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_ELEMS)
+        except IOError:
+            msg += 'Failed to load result data for elements.'
+            self.result_elements = None
+        try:          
+            self.result_times = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_TIME)
+        except IOError:
+            msg += 'Failed to load result data for times.'
+            self.result_times = None
+        
+        if msg:
+            self.messenger('{}. Please process data first'.format(msg))
+            self.tabWidget.setCurrentWidget(self.data_processing)
+            self.tabWidget.setCurrentIndex(2) #2 should be data processing
+            return False
+        else:
+            return True  
+            
     def start_logger(self):
         '''
         logging tool startup
@@ -512,23 +548,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._load_surface()
         self._fill_mesh_mtr_form()
         self.messenger('MESH tools successfully loaded all data', 8000)
-        self._analyser_dialog()
         
-        self.tabWidget.show()            
+                  
         
     def analyse_basic_problem(self):
         '''
         action for basic analyser
         '''
+        
         self.master_work_dir = self.work_dir + '/'
         self.problem_type = 'basic'
         if self.find_and_open_inifile():
             self.box_merger.setHidden(True)
-            self.tabWidget.removeTab(2)
-            self.tabWidget.addTab(self.tab_2,'Basic Analyser')
+            self.__remove_all_tabs()
+            self.tabWidget.addTab(self.basic_analyser,'Basic Analyser')
+            self.tabWidget.addTab(self.data_processing,'Data Processing')
             self.init_mesh_tools() 
-            self.tabWidget.setCurrentIndex(2)
+            self.tabWidget.setCurrentWidget(self.basic_analyser)
             self._save_setup()
+            
+        if not self.result_elements:
+            self.read_concentrations()
+        
+        self._analyser_dialog() #check the data before display manualy
+        self.tabWidget.show()          
         
     def analyse_sensitivity_task(self):
         '''
@@ -538,12 +581,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.problem_type = 'compare'
         if self.find_and_open_inifile():
             self.box_merger.setHidden(True)
-            self.tabWidget.removeTab(2)
-            self.tabWidget.addTab(self.tab_3,'Sensitivity Analyser')
+            #self.tabWidget.removeTab(2)
+            #self.tabWidget.addTab(self.tab_3,'Sensitivity Analyser')
             self.label_analyser_title.setText('Sensitivity Analyser')
             self.init_mesh_tools()  
             self.tabWidget.setCurrentIndex(2)
             self._save_setup()
+            
+        self.tabWidget.show()      
         
     def analyse_monte_carlo(self):
         '''
@@ -553,14 +598,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.problem_type = 'compare'
         
         if self.find_and_open_inifile():
-            self.tabWidget.removeTab(2)
-            self.tabWidget.addTab(self.tab_3,'Monte Carlo Analyser')
+            #self.tabWidget.removeTab(2)
+            #self.tabWidget.addTab(self.tab_3,'Monte Carlo Analyser')
             self.label_analyser_title.setText('Monte Carlo Analyser')
             self.init_mesh_tools()  
             
             self.box_merger.setHidden(False)
             self.tabWidget.setCurrentIndex(2)
-            self._save_setup()         
+            self._save_setup() 
+            
+        self.tabWidget.show()              
         
         
     def open_task_dir(self):
