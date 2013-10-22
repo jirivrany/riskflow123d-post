@@ -4,12 +4,12 @@
 RiskFlow123D Postprocesor main module
 '''
 
-from PySide.QtGui import  QFont, QListWidgetItem, \
+from PyQt4.QtGui import  QFont, QListWidgetItem, \
      QMainWindow, QApplication, QFileDialog, QStatusBar,\
      QTableWidgetItem, QIntValidator, QDoubleValidator, QSortFilterProxyModel, QStandardItemModel,\
      QStandardItem
 
-from PySide.QtCore import Qt
+from PyQt4.QtCore import Qt
 
 
 from iniparse import INIConfig
@@ -327,9 +327,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         actions = {
                    'tab_4' : '_data_dialog',
-                   'tab_2' : '_analyser_dialog',
+                   'tab_1' : '_analyser_dialog',
                    }
         idx = self.tabWidget.currentWidget().objectName()
+        print idx
         if actions.has_key(idx):
             getattr(self, actions[idx])()
         
@@ -337,10 +338,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         a dialog for analyser screen
         '''
-       
         
         ptr = self.tabWidget.currentWidget().objectName()
-        if ptr == 'tab_2':
+        if ptr == 'tab_1':
             if not self.result_elements:
                 self.read_concentrations()
             
@@ -481,7 +481,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if fname == None:
             fname = self.master_work_dir+SEPAR+self.file_dict['Transport_out']
             
-        
+        print self.master_work_dir
         self.result_elements = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_ELEMS)  
         self.result_times = transport.load_vysledek(self.master_work_dir + SEPAR + FNAME_TIME)
         if not self.result_elements and not self.result_times:
@@ -512,6 +512,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._load_surface()
         self._fill_mesh_mtr_form()
         self.messenger('MESH tools successfully loaded all data', 8000)
+        self._analyser_dialog()
+        
         self.tabWidget.show()            
         
     def analyse_basic_problem(self):
@@ -686,7 +688,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         action for controlin mesh_element_explorer display block
         '''
-        idxtu = self.mesh_list.currentIndex().data()
+        idxtu = str(self.mesh_list.currentIndex().data().toString())
         idx, typ, mat = idxtu.split()
         del(typ)
         del(mat)
