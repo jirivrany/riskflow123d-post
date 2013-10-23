@@ -1,4 +1,4 @@
-import os.path
+
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 # coding: utf-8
@@ -6,7 +6,7 @@ __author__="albert"
 __date__ ="$10.8.2011 13:37:40$"
 
 import sys
-import os
+import os.listdir, os.curdir
 
 # @TODO metodu open ktera otevre soubor pro dalsi zpracovani
 # @TODO metody pro nacteni hodnot jednotlivych dilcich souboru
@@ -22,7 +22,7 @@ def openFile(fileName):
         try:
             text = open(fileName)
             return text
-            close(fileName)
+            
         except IOError:
             return False
 

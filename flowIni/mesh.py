@@ -9,7 +9,7 @@ class Mesh(object):
 
     Members:
     nodes -- A dict of the form { nodenode_id: [ xcoord, ycoord, zcoord] }
-    elements -- A dict of the form { elemnode_id: (type, [tags], [nodenode_ids]) }
+    elements -- A dict of the form { elemnode_id: (node_type, [tags], [nodenode_ids]) }
     mtr_index == A dict with index of materials - { element tag nr. 1 : [elmnode_id]}
     elm_index == A dict with index of elements - { nodenode_id : [elmnodeids] }
     
@@ -63,7 +63,7 @@ class Mesh(object):
                         print 'Element format error: '+line
                         readmode = 0
                     else:
-                        (node_id, type) = columns[0:2]
+                        (node_id, node_type) = columns[0:2]
                         if readmode == 2:
                             # Version 1.0 Elements
                             tags = columns[2:4]
@@ -73,7 +73,7 @@ class Mesh(object):
                             ntags = columns[2]
                             tags = columns[3:3+ntags]
                             nodes = columns[3+ntags:]
-                        self.elements[node_id] = (type, tags, nodes)
+                        self.elements[node_id] = (node_type, tags, nodes)
                         
                         #create elm index
                         for no in nodes:
@@ -100,8 +100,8 @@ class Mesh(object):
         print >>fp, '$EndNodes'
         print >>fp, '$Elements\n%d'%len(self.elements)
         for (node_id, elem) in self.elements.items():
-            (type, tags, nodes) = elem
-            print >>fp, node_id, type, len(tags),
+            (node_type, tags, nodes) = elem
+            print >>fp, node_id, node_type, len(tags),
             print >>fp, ' '.join(map(str, tags)),
             print >>fp, ' '.join(map(str, nodes))
         print >>fp, '$EndElements'
