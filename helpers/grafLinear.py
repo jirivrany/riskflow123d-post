@@ -3,8 +3,8 @@ Created on 18.1.2012
 
 @author: albert
 '''
-import matplotlib
-matplotlib.use('Agg')
+from matplotlib import use
+use('Agg')
 import matplotlib.pyplot as plt
 
 
