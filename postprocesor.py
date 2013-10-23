@@ -6,7 +6,7 @@ RiskFlow123D Postprocesor main module
 
 from PyQt4.QtGui import  QFont, QListWidgetItem, \
      QMainWindow, QApplication, QFileDialog, QStatusBar,\
-     QTableWidgetItem, QIntValidator, QDoubleValidator, QSortFilterProxyModel, QStandardItemModel,\
+     QIntValidator, QDoubleValidator, QSortFilterProxyModel, QStandardItemModel,\
      QStandardItem
 
 from PyQt4.QtCore import Qt
@@ -614,10 +614,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''SetUP output using Qfiledialog'''        
         adr = "."
         tmp = QFileDialog.getExistingDirectory(self, "Open output directory", adr, options=QFileDialog.ShowDirsOnly)
-        if ruzne.isit_task_folder(tmp): 
-            self.work_dir = tmp
+        if ruzne.isit_task_folder(tmp):
+            self.work_dir = str(tmp)
             self.identify_problem_type() 
-        else: self.messenger('ERROR: Selected directory does not contain problem.type file!')
+        else: 
+            self.messenger('ERROR: Selected directory does not contain problem.type file!')
         
     def identify_problem_type(self):
         '''
@@ -674,7 +675,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _save_setup(self):
         '''saves ini file'''
         self.setup['Work']['Dir'] = self.work_dir
-        fnew = open(__inifile__,'w')
+        fnew = open(__inifile__, 'w')
         print >> fnew, self.setup
         fnew.close()
             
