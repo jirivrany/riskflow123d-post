@@ -570,6 +570,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.read_concentrations()
         
         self._analyser_dialog() #check the data before display manualy
+        self._data_dialog()
         self.tabWidget.show()          
         
     def analyse_sensitivity_task(self):
