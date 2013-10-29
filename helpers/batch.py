@@ -3,8 +3,8 @@ Created on 9.10.2012
 
 @author: albert
 '''
-import os
-import sys
+import os.path
+import sys.platform
 
 SEPARATOR = '/'
 

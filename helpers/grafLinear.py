@@ -41,17 +41,3 @@ def draw_chart(xkey, times, disp, where):
     plt.savefig('{}element_{}'.format(where,xkey))
     plt.close()
     
-
-if __name__ == '__main__':
-    import pickle
-    fo = open('../../../data/output_zpracovany.pickle','rb')
-    data = pickle.load(fo)
-    times = pickle.load(fo)
-    print times
-    fo.close()
-    
-    print data.items()
-    for xkey, xval in data.items():
-        disp = fill_up_zeros(times, xval)         
-        draw_chart(times,disp,'../../../data/grafy/')
-        

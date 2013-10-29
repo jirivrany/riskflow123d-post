@@ -19,7 +19,6 @@ from genericpath import exists
 from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger
 from ui_postprocess import Ui_MainWindow
 from os import mkdir, listdir, path
-import sys
 
 
 __version__ = '0.0.2'
@@ -1035,13 +1034,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.groupBox_2.setTitle(msg)
             
         except:
-            print "Unexpected error:", sys.exc_info()[0]
-            raise            
+            self.messenger('Unexpected Error', 8000)          
             
         
 if __name__ == '__main__':
     freeze_support()
-    APP = QApplication(sys.argv)
+    ARGS = []
+    APP = QApplication(ARGS)
     FRAME = MainWindow()
     FRAME.show()    
     APP.exec_()
