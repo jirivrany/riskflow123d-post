@@ -5,7 +5,7 @@ Created on 18.1.2012
 '''
 from matplotlib import use
 use('Agg')
-import matplotlib.pyplot as plt
+from matplotlib.pyplot import plot, xlabel, ylabel, title, grid, axes, savefig, close
 
 
 def fill_up_zeros(times, xval):
@@ -32,12 +32,12 @@ def list_filter(dct, flt):
     return temp
 
 def draw_chart(xkey, times, disp, where):
-    plt.plot(times, disp, '-', lw=2)
-    plt.xlabel('time (s)')
-    plt.ylabel('concentration')
-    plt.title('graph of concentration for element {}'.format(xkey))
-    plt.grid(True)
-    plt.axes()
-    plt.savefig('{}element_{}'.format(where,xkey))
-    plt.close()
+    plot(times, disp, '-', lw=2)
+    xlabel('time (s)')
+    ylabel('concentration')
+    title('graph of concentration for element {}'.format(xkey))
+    grid(True)
+    axes()
+    savefig('{}element_{}'.format(where,xkey))
+    close()
     
