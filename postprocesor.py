@@ -16,7 +16,7 @@ from iniparse import INIConfig
 from multiprocessing import Process, Queue, cpu_count, freeze_support     
 from flowIni import flow, material, mesh, transport, surface
 from genericpath import exists
-from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger
+from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger, mapcon
 from ui_postprocess import Ui_MainWindow
 from os import mkdir, listdir, path
 
@@ -111,6 +111,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #na zacatku neni nic
         self.tabWidget.hide()
         self.__remove_all_tabs()
+        self.button_test.clicked.connect(self.mapa_work)
+        
+    def mapa_work(self):
+        '''
+        pracovni metoda pro obsluhu mapy koncentraci
+        '''
+        if not self.result_elements:
+            self.read_concentrations()
+            
+        triangles = mapcon.get_triangles(self.msh, self.result_elements)
+        mapcon.draw_map(triangles)
+        
+        
+            
+            
         
     def __remove_all_tabs(self):
         '''
@@ -1033,6 +1048,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.mesh_list.repaint()
             msg = "{0} elements in the list".format(len(self.displayed_mesh_list))
             self.groupBox_2.setTitle(msg)
+            
+            
             
         except:
             self.messenger('Unexpected Error', 8000)          
