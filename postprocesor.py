@@ -124,6 +124,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             vals = self._read_surface_elements()
             triangles = mapcon.get_triangles(vals, self.msh.nodes, self.result_elements)
             mapcon.draw_map(triangles)
+        elif self.maps_radio_section.isChecked():
+            try:
+                val = float(self.maps_section_height.text())
+            except ValueError:
+                self.messenger("ERROR: Need altitude for the plane to cut")
+                return False
+            else:
+                vals = self._mesh_find_through('z', val)
+                triangles = mapcon.get_triangles(vals, self.msh.nodes, self.result_elements, False, val)
+                mapcon.draw_map(triangles)   
+                
         else:
             self.messenger("NEXT TIME")
         
@@ -164,6 +175,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         float_validator = QDoubleValidator()
         self.edit_merge_minval.setValidator(float_validator)
+        self.maps_section_height.setValidator(float_validator)
         
         self.action_Open.triggered.connect(self.open_task_dir)
         self.action_Basic_problem.triggered.connect(self.analyse_basic_problem)
@@ -888,13 +900,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         return vals
         
-    def _mesh_find_through(self, axis = 'z'):
+    def _mesh_find_through(self, axis = 'z', val = 'default'):
         '''import elements with at last one node over coordinate in given axis,
            such elements has to be cuted through given plane
            compare given val with the value of mesh spinbox
         @param axix: what axis (x, y, z)
         '''
-        val = int(self.edit_mesh_crd.text())
+        if val == 'default':
+            val = int(self.edit_mesh_crd.text())
         
         vals = {}
         for elid, elem in self.msh.elements.items():

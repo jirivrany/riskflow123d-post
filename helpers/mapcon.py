@@ -6,6 +6,7 @@ Created on 20 Nov 2013
 import matplotlib.pyplot as plt
 import numpy as np
 import toptriangle
+import section
 
 def dump_test(data):
     '''
@@ -25,7 +26,8 @@ def conc_at_time(elid, ctime, dict_concentrations):
     
     return 0.0
 
-def get_triangle_from_node_coords(elem, nodes):
+    
+def get_triangle_from_node_coords(elem, nodes, height=0):
     '''
     get the node x,y coordinates from node structure
     node has 4 points in 3D - we need 3 of it, composing largest triangle
@@ -35,16 +37,29 @@ def get_triangle_from_node_coords(elem, nodes):
     
     return toptriangle.get_triangle(*node_coords)
 
-def get_triangles(mesh_elements, nodes, dict_concentrations):
+def get_triangle_from_cut(elem, nodes, height):
+    '''
+    get the triangle from tetrahedra cut
+    '''
+    node_coords = [tuple(nodes[node_id]) for node_id in elem[2]]
+    
+    return section.triangles_from_cut(height, node_coords)
+    
+
+def get_triangles(mesh_elements, nodes, dict_concentrations, surface=True, height=0):
     '''
     transform the mesh coordinates to the list 
     of tuples (concentration, triangle)
     only 3D elements are valid
     '''
+    if surface:
+        func_get = get_triangle_from_node_coords
+    else:
+        func_get = get_triangle_from_cut    
     
             
     triangles = [ (conc_at_time(elid, "500.0", dict_concentrations), 
-                   get_triangle_from_node_coords(elem, nodes)) 
+                   func_get(elem, nodes, height)) 
                  for elid, elem in mesh_elements.iteritems() 
                  if elem[0] > 2]
     
@@ -62,10 +77,11 @@ def draw_map(triangles):
     ctr = 0
     
     for conc, tria in triangles:
-        conc_list.append(conc)
-        grid.extend(tria)
-        tri_list.append([ctr, ctr+1, ctr+2])
-        ctr += 3
+        if tria:
+            conc_list.append(conc)
+            grid.extend(tria)
+            tri_list.append([ctr, ctr+1, ctr+2])
+            ctr += 3
         
     xy = np.asarray(grid)
     
