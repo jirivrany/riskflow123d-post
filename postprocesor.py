@@ -111,7 +111,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #na zacatku neni nic
         self.tabWidget.hide()
         self.__remove_all_tabs()
-        self.button_test.clicked.connect(self.mapa_work)
+        self.button_draw_maps.clicked.connect(self.mapa_work)
         
     def mapa_work(self):
         '''
@@ -119,8 +119,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         if not self.result_elements:
             self.read_concentrations()
-            
-        triangles = mapcon.get_triangles(self.msh, self.result_elements)
+        
+        triangles = mapcon.get_triangles(self.displayed_mesh_list, self.msh.nodes, self.result_elements)
         mapcon.draw_map(triangles)
         
         
@@ -806,8 +806,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.messenger('Choose axis first!', 8000)
             return False             
-        
-    def _mesh_import_surface(self):    
+    
+    def _read_surface_elements(self):
         '''
         imports surface elements to mesh list
         need surface_result file to work
@@ -822,7 +822,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             elid = int(elid)
             if self.msh.elements.has_key(elid):
                 vals[elid] = self.msh.elements[elid]
-            
+                
+        return vals        
+        
+    def _mesh_import_surface(self):    
+        '''
+        imports surface elements to mesh list
+        need surface_result file to work
+        '''
+        vals = self._read_surface_elements()
         self._mesh_import_list_updater(vals)
         
     def _mesh_remove_zero(self):

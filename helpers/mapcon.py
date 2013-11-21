@@ -35,7 +35,7 @@ def get_triangle_from_node_coords(elem, nodes):
     
     return toptriangle.get_triangle(*node_coords)
 
-def get_triangles(mesh, dict_concentrations):
+def get_triangles(mesh_elements, nodes, dict_concentrations):
     '''
     transform the mesh coordinates to the list 
     of tuples (concentration, triangle)
@@ -44,11 +44,10 @@ def get_triangles(mesh, dict_concentrations):
     
             
     triangles = [ (conc_at_time(elid, "500.0", dict_concentrations), 
-                   get_triangle_from_node_coords(elem, mesh.nodes)) 
-                 for elid, elem in mesh.elements.iteritems() 
+                   get_triangle_from_node_coords(elem, nodes)) 
+                 for elid, elem in mesh_elements.iteritems() 
                  if elem[0] > 2]
     
-    dump_test(triangles)
     return triangles
 
 def draw_map(triangles):
@@ -85,7 +84,7 @@ def draw_map(triangles):
     plt.xlabel('mesh X coord')
     plt.ylabel('mesh Y coord')
     
-    plt.savefig('mapa', format="svg")               
+    plt.savefig('../../mapa', format="svg")               
             
     
 
