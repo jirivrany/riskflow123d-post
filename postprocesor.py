@@ -119,10 +119,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         if not self.result_elements:
             self.read_concentrations()
-        
-        triangles = mapcon.get_triangles(self.displayed_mesh_list, self.msh.nodes, self.result_elements)
-        mapcon.draw_map(triangles)
-        
+            
+        if self.maps_radio_surface.isChecked():    
+            vals = self._read_surface_elements()
+            triangles = mapcon.get_triangles(vals, self.msh.nodes, self.result_elements)
+            mapcon.draw_map(triangles)
+        else:
+            self.messenger("NEXT TIME")
         
             
             
@@ -188,6 +191,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_mesh_rem_elmid.clicked.connect(self._mesh_remove_id)
         self.mesh_list.itemClicked.connect(self._mesh_element_explorer_control)
         self.mesh_radio_z.setChecked(True)
+        self.maps_radio_surface.setChecked(True)
         self.button_mesh_remove_zero.clicked.connect(self._mesh_remove_zero)
         
         integer_validator = QIntValidator()
