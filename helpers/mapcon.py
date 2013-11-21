@@ -27,7 +27,7 @@ def conc_at_time(elid, ctime, dict_concentrations):
     return 0.0
 
     
-def get_triangle_from_node_coords(elem, nodes, height=0):
+def get_triangle_from_node_coords(elem, nodes):
     '''
     get the node x,y coordinates from node structure
     node has 4 points in 3D - we need 3 of it, composing largest triangle
@@ -46,20 +46,15 @@ def get_triangle_from_cut(elem, nodes, height):
     return section.triangles_from_cut(height, node_coords)
     
 
-def get_triangles(mesh_elements, nodes, dict_concentrations, surface=True, height=0):
+def get_triangles_surface(mesh_elements, nodes, dict_concentrations):
     '''
     transform the mesh coordinates to the list 
     of tuples (concentration, triangle)
     only 3D elements are valid
     '''
-    if surface:
-        func_get = get_triangle_from_node_coords
-    else:
-        func_get = get_triangle_from_cut    
-    
             
     triangles = [ (conc_at_time(elid, "500.0", dict_concentrations), 
-                   func_get(elem, nodes, height)) 
+                   get_triangle_from_node_coords(elem, nodes)) 
                  for elid, elem in mesh_elements.iteritems() 
                  if elem[0] > 2]
     

@@ -122,7 +122,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         if self.maps_radio_surface.isChecked():    
             vals = self._read_surface_elements()
-            triangles = mapcon.get_triangles(vals, self.msh.nodes, self.result_elements)
+            triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements)
             mapcon.draw_map(triangles)
         elif self.maps_radio_section.isChecked():
             try:
