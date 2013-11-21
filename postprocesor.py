@@ -100,7 +100,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.spin_grade_filter.setRange(0, 5)
         self.spin_grade_filter.setDisabled(True)
         self.button_grade_filter.setDisabled(True)
-        self.button_grade_filter.clicked.connect(self.__filter_table_rslt)      
+        self.button_grade_filter.clicked.connect(self.__filter_table_rslt)
+        self.maps_section_height.textChanged.connect(self.__focus_on_cut)      
         
         
         #progress bar
@@ -126,19 +127,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             mapcon.draw_map(triangles)
         elif self.maps_radio_section.isChecked():
             try:
-                val = float(self.maps_section_height.text())
+                height = float(self.maps_section_height.text())
             except ValueError:
                 self.messenger("ERROR: Need altitude for the plane to cut")
                 return False
             else:
-                vals = self._mesh_find_through('z', val)
-                triangles = mapcon.get_triangles(vals, self.msh.nodes, self.result_elements, False, val)
+                vals = self._mesh_find_through('z', height)
+                triangles = mapcon.get_triangles_section(vals, self.msh.nodes, self.result_elements, height)
                 mapcon.draw_map(triangles)   
                 
         else:
             self.messenger("NEXT TIME")
         
             
+    def __focus_on_cut(self):
+        '''
+        if user adds height, switch the radio maps to section cut
+        '''
+        self.maps_radio_section.setChecked(True)
             
         
     def __remove_all_tabs(self):

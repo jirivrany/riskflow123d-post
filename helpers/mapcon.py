@@ -42,9 +42,33 @@ def get_triangle_from_cut(elem, nodes, height):
     get the triangle from tetrahedra cut
     '''
     node_coords = [tuple(nodes[node_id]) for node_id in elem[2]]
-    
     return section.triangles_from_cut(height, node_coords)
     
+
+def get_triangles_section(mesh_elements, nodes, dict_concentrations, height):
+    '''
+    transform the mesh coordinates to the list 
+    of tuples (concentration, triangle)
+    only 3D elements are valid
+    '''
+    triangles = []
+    conc = []
+    for elid, elem in mesh_elements.iteritems():
+        if elem[0] > 2:
+            sub_result = get_triangle_from_cut(elem, nodes, height)
+            if sub_result:
+                if len(sub_result) == 2:
+                    #pak jde o pole se dvema trojuhleniky, 
+                    #udelame extend a pridame 2x stejnou koncentraci
+                    triangles.extend(sub_result)
+                    conc.append(conc_at_time(elid, "500.0", dict_concentrations))
+                    conc.append(conc_at_time(elid, "500.0", dict_concentrations))
+                elif len(sub_result) == 3:
+                    #pak jde o jeden trojuhelnik a muzem udelat normalni append
+                    triangles.append(sub_result)    
+                    conc.append(conc_at_time(elid, "500.0", dict_concentrations))
+    
+    return zip(conc, triangles)        
 
 def get_triangles_surface(mesh_elements, nodes, dict_concentrations):
     '''
