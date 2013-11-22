@@ -120,10 +120,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         if not self.result_elements:
             self.read_concentrations()
-        
+            
+            
         map_options = {
             "map_format": "svg",
-            "map_file": "../../mapa"
+            "map_file": "{}/mapa.svg".format(self.work_dir)
         }
         
         sim_time = str(self.maps_sim_time_select.currentText())
