@@ -730,12 +730,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     
     def __fill_maps_times(self):
         '''fill form in the maps draw / with simulation times'''
-            
-        self.maps_sim_time_select.clear()
-        wherefrom = self.result_times
-        data = ["%s" % str(k) for k in sorted(wherefrom, reverse=True)]
-        self.maps_sim_time_select.insertItems(0, data)
-        self.maps_sim_time_select.repaint()        
+        if self.result_times:    
+            self.maps_sim_time_select.clear()
+            wherefrom = self.result_times
+            data = ["%s" % str(k) for k in sorted(wherefrom, reverse=True)]
+            self.maps_sim_time_select.insertItems(0, data)
+            self.maps_sim_time_select.repaint()        
             
     
     def _save_setup(self):
