@@ -120,9 +120,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         if not self.result_elements:
             self.read_concentrations()
+        
             
         if self.maps_radio_surface.isChecked():    
             vals = self._read_surface_elements()
+            self.messenger("Drawing map of concetration to file...")
             triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements)
             mapcon.draw_map(triangles)
         elif self.maps_radio_section.isChecked():
@@ -133,11 +135,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 return False
             else:
                 vals = self._mesh_find_through('z', height)
+                self.messenger("Drawing map of concetration to file...")
                 triangles = mapcon.get_triangles_section(vals, self.msh.nodes, self.result_elements, height)
-                mapcon.draw_map(triangles)   
-                
+                mapcon.draw_map(triangles)
         else:
             self.messenger("NEXT TIME")
+            return False
+        
+        self.messenger("OK - map of concetrations is ready in the file")   
         
             
     def __focus_on_cut(self):
