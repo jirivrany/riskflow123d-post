@@ -92,24 +92,35 @@ def triangles_from_cut(height, points):
     as the cut can be triangle, or quadrilateral we shall
     check the result and do Delaunay triangluation if neccessary
     '''
-    triangle = cut_tetrahedra(height, points)
-    if len(triangle) == 3:
-        return triangle
-    elif len(triangle) == 4:
-        tri = Delaunay(triangle)
-        inn = []
+    cut = cut_tetrahedra(height, points)
+    if len(cut) == 3:
+        # 3 points means triangle
+        return cut
+    elif len(cut) == 4:
+        # 4 points need triangulation first
+        tri = Delaunay(cut)
         triangles = []
         for simpl in tri.simplices:
+            inn = []
             for idx in simpl:
-                inn.append(triangle[idx])
-            triangles.append(inn)    
+                inn.append(cut[idx])
+                
+            triangles.append(inn)
+                
         
         return triangles
-                
-    
-if __name__ == "__main__":
+
+def test_4points_section():
+    points = [ [1437.0, 5398.0, -46.0], [1267.0, 5320.0, 270.0], [1460.0, 5138.0, 27.0], [1522.0, 5331.0, 125.0]]                
+    print cut_tetrahedra(100.0, points)
+    print triangles_from_cut(100.0, points)
+
+def test_3points_section(): 
     points = [ [7056.0, 3362.0, 478.0], [7056.0, 3362.0, 317.0], [6936.0, 3266.0, 481.0], [6854.0, 3373.0, 392.0] ]
     
-    print cut_tetrahedra(350.0, points)
-    #test_basic_computation()
+    print cut_tetrahedra(350.0, points)   
+    
+if __name__ == "__main__":
+    
+    test_4points_section()
     

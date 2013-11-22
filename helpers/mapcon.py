@@ -63,7 +63,7 @@ def get_triangles_section(mesh_elements, nodes, dict_concentrations, height):
                     triangles.extend(sub_result)
                     conc.append(conc_at_time(elid, "500.0", dict_concentrations))
                     conc.append(conc_at_time(elid, "500.0", dict_concentrations))
-                elif len(sub_result) == 3:
+                if len(sub_result) == 3:
                     #pak jde o jeden trojuhelnik a muzem udelat normalni append
                     triangles.append(sub_result)    
                     conc.append(conc_at_time(elid, "500.0", dict_concentrations))
