@@ -20,12 +20,13 @@ def conc_at_time(elid, ctime, dict_concentrations):
     '''
     get the concentration on element in given time
     '''
-    if dict_concentrations.has_key(str(elid)):
+    try:
         conc = dict_concentrations[str(elid)][ctime]
+    except KeyError:
+        return 0.0
+    else:    
         return conc
     
-    return 0.0
-
     
 def get_triangle_from_node_coords(elem, nodes):
     '''
@@ -45,7 +46,7 @@ def get_triangle_from_cut(elem, nodes, height):
     return section.triangles_from_cut(height, node_coords)
     
 
-def get_triangles_section(mesh_elements, nodes, dict_concentrations, height):
+def get_triangles_section(mesh_elements, nodes, dict_concentrations, height, sim_time):
     '''
     transform the mesh coordinates to the list 
     of tuples (concentration, triangle)
@@ -61,33 +62,36 @@ def get_triangles_section(mesh_elements, nodes, dict_concentrations, height):
                     #pak jde o pole se dvema trojuhleniky, 
                     #udelame extend a pridame 2x stejnou koncentraci
                     triangles.extend(sub_result)
-                    conc.append(conc_at_time(elid, "500.0", dict_concentrations))
-                    conc.append(conc_at_time(elid, "500.0", dict_concentrations))
+                    conc.append(conc_at_time(elid, sim_time, dict_concentrations))
+                    conc.append(conc_at_time(elid, sim_time, dict_concentrations))
                 if len(sub_result) == 3:
                     #pak jde o jeden trojuhelnik a muzem udelat normalni append
                     triangles.append(sub_result)    
-                    conc.append(conc_at_time(elid, "500.0", dict_concentrations))
+                    conc.append(conc_at_time(elid, sim_time, dict_concentrations))
     
     return zip(conc, triangles)        
 
-def get_triangles_surface(mesh_elements, nodes, dict_concentrations):
+def get_triangles_surface(mesh_elements, nodes, dict_concentrations, sim_time):
     '''
     transform the mesh coordinates to the list 
     of tuples (concentration, triangle)
     only 3D elements are valid
     '''
             
-    triangles = [ (conc_at_time(elid, "500.0", dict_concentrations), 
+    triangles = [ (conc_at_time(elid, sim_time, dict_concentrations), 
                    get_triangle_from_node_coords(elem, nodes)) 
                  for elid, elem in mesh_elements.iteritems() 
                  if elem[0] > 2]
     
     return triangles
 
-def draw_map(triangles):
+def draw_map(triangles, options):
     '''
     get the triangle tuple (concentration, triangle] prepared before
     and draw the map of triangles
+    options :
+    "map_format": "svg",
+    "map_file": "../../mapa"
     '''
     
     conc_list = []
@@ -119,7 +123,7 @@ def draw_map(triangles):
     plt.xlabel('mesh X coord')
     plt.ylabel('mesh Y coord')
     
-    plt.savefig('../../mapa', format="svg")               
+    plt.savefig(options["map_file"], format=options["map_format"])               
             
     
 

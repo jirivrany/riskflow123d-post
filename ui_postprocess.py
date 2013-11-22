@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'postprocesing.ui'
 #
-# Created: Thu Nov 21 13:02:22 2013
+# Created: Fri Nov 22 10:21:18 2013
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -228,6 +228,9 @@ class Ui_MainWindow(object):
         self.maps_check_nonzero = QtGui.QCheckBox(self.groupBox_7)
         self.maps_check_nonzero.setObjectName(_fromUtf8("maps_check_nonzero"))
         self.horizontalLayout_9.addWidget(self.maps_check_nonzero)
+        self.maps_sim_time_select = QtGui.QComboBox(self.groupBox_7)
+        self.maps_sim_time_select.setObjectName(_fromUtf8("maps_sim_time_select"))
+        self.horizontalLayout_9.addWidget(self.maps_sim_time_select)
         self.button_draw_maps = QtGui.QPushButton(self.groupBox_7)
         self.button_draw_maps.setObjectName(_fromUtf8("button_draw_maps"))
         self.horizontalLayout_9.addWidget(self.button_draw_maps)

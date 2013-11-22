@@ -112,21 +112,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #na zacatku neni nic
         self.tabWidget.hide()
         self.__remove_all_tabs()
-        self.button_draw_maps.clicked.connect(self.mapa_work)
+        self.button_draw_maps.clicked.connect(self.map_concentrations)
         
-    def mapa_work(self):
+    def map_concentrations(self):
         '''
         pracovni metoda pro obsluhu mapy koncentraci
         '''
         if not self.result_elements:
             self.read_concentrations()
         
+        map_options = {
+            "map_format": "svg",
+            "map_file": "../../mapa"
+        }
+        
+        sim_time = str(self.maps_sim_time_select.currentText())
             
         if self.maps_radio_surface.isChecked():    
             vals = self._read_surface_elements()
+            if self.maps_check_nonzero.isChecked():
+                vals = self.__remove_zeros_from_mesh_list(vals)
             self.messenger("Drawing map of concetration to file...")
-            triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements)
-            mapcon.draw_map(triangles)
+            triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements, sim_time)
+            mapcon.draw_map(triangles, map_options)
         elif self.maps_radio_section.isChecked():
             try:
                 height = float(self.maps_section_height.text())
@@ -135,14 +143,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 return False
             else:
                 vals = self._mesh_find_through('z', height)
+                if self.maps_check_nonzero.isChecked():
+                    vals = self.__remove_zeros_from_mesh_list(vals)
                 self.messenger("Drawing map of concetration to file...")
-                triangles = mapcon.get_triangles_section(vals, self.msh.nodes, self.result_elements, height)
-                mapcon.draw_map(triangles)
+                triangles = mapcon.get_triangles_section(vals, self.msh.nodes, self.result_elements, height, sim_time)
+                mapcon.draw_map(triangles, map_options)
         else:
             self.messenger("NEXT TIME")
             return False
         
-        self.messenger("OK - map of concetrations is ready in the file")   
+        self.messenger("OK - map of concentrations is ready in the file")   
         
             
     def __focus_on_cut(self):
@@ -150,6 +160,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if user adds height, switch the radio maps to section cut
         '''
         self.maps_radio_section.setChecked(True)
+    
+    
+   
             
         
     def __remove_all_tabs(self):
@@ -610,6 +623,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         if not self.result_elements:
             self.read_concentrations()
+            
+        self.__fill_maps_times()    
         
         self._analyser_dialog() #check the data before display manualy
         self._data_dialog()
@@ -711,7 +726,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             fnew = open(__inifile__,'w')
             print >> fnew, setup
             fnew.close()
+    
+    def __fill_maps_times(self):
+        '''fill form in the maps draw / with simulation times'''
             
+        self.maps_sim_time_select.clear()
+        wherefrom = self.result_times
+        data = ["%s" % str(k) for k in sorted(wherefrom, reverse=True)]
+        self.maps_sim_time_select.insertItems(0, data)
+        self.maps_sim_time_select.repaint()        
             
     
     def _save_setup(self):
@@ -860,16 +883,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         vals = self._read_surface_elements()
         self._mesh_import_list_updater(vals)
         
-    def _mesh_remove_zero(self):
+    def __remove_zeros_from_mesh_list(self, mesh_list):
         '''
-        removes elemtns with no (zero values) concentration in time from mesh list
+        removes elemtns with no (zero values) concentration in time from given mesh list
         '''
         if not self.result_elements:
             self.read_concentrations()
         
-        for key in self.displayed_mesh_list.keys():
+        for key in mesh_list.keys():
             if str(key) not in self.result_elements:
-                del(self.displayed_mesh_list[key])
+                del(mesh_list[key])
+                
+        return mesh_list            
+        
+    def _mesh_remove_zero(self):
+        '''
+        removes elemtns with no (zero values) concentration in time from mesh list
+        '''
+        
+        self.displayed_mesh_list = self.__remove_zeros_from_mesh_list(self.displayed_mesh_list)
         
         msg = 'Refreshing the list'
         self.messenger(msg)
