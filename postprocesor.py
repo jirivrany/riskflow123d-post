@@ -9,14 +9,14 @@ from PyQt4.QtGui import  QFont, QListWidgetItem, \
      QIntValidator, QDoubleValidator, QSortFilterProxyModel, QStandardItemModel,\
      QStandardItem
 
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QRect
 
 
 from iniparse import INIConfig
 from multiprocessing import Process, Queue, cpu_count, freeze_support     
 from flowIni import flow, material, mesh, transport, surface
 from genericpath import exists
-from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger, mapcon
+from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger, mapcon, mapcanvas
 from ui_postprocess import Ui_MainWindow
 from os import mkdir, listdir, path
 
@@ -80,7 +80,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tasks = None
         self.solutions = None
         self.problem_type = None
-        
+        self.canvas = None
         #setup app
         self.setup = None
         self._load_setup()
@@ -123,8 +123,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
             
         map_options = {
-            "map_format": "svg",
-            "map_file": "{}/mapa.svg".format(self.work_dir)
+            "map_format": "png",
+            "map_file": "{}/mapa.png".format(self.work_dir)
         }
         
         sim_time = str(self.maps_sim_time_select.currentText())
@@ -135,7 +135,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 vals = self.__remove_zeros_from_mesh_list(vals)
             self.messenger("Drawing map of concetration to file...")
             triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements, sim_time)
-            mapcon.draw_map(triangles, map_options)
         elif self.maps_radio_section.isChecked():
             try:
                 height = float(self.maps_section_height.text())
@@ -148,12 +147,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     vals = self.__remove_zeros_from_mesh_list(vals)
                 self.messenger("Drawing map of concetration to file...")
                 triangles = mapcon.get_triangles_section(vals, self.msh.nodes, self.result_elements, height, sim_time)
-                mapcon.draw_map(triangles, map_options)
+                
         else:
             self.messenger("NEXT TIME")
             return False
         
+        
+        mapcon.draw_map(triangles, map_options)
+        self.map_conc_poup(triangles)
         self.messenger("OK - map of concentrations is ready in the file")   
+    
+    
+    def map_conc_poup(self, triangles):
+        '''
+        popup window for map concentration
+        '''
+        self.canvas = mapcanvas.MapCanvas(triangles)
+        self.canvas.setGeometry(QRect(100, 100, 700, 700))
+        self.canvas.show()
         
             
     def __focus_on_cut(self):
