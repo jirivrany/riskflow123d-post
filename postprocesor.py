@@ -152,17 +152,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.messenger("NEXT TIME")
             return False
         
+        triangulation = mapcon.prepare_triangulation(triangles)
+        mapcon.draw_map(triangulation, map_options)
+        self.map_conc_poup(triangulation)
         
-        mapcon.draw_map(triangles, map_options)
-        self.map_conc_poup(triangles)
         self.messenger("OK - map of concentrations is ready in the file")   
     
     
-    def map_conc_poup(self, triangles):
+    def map_conc_poup(self, triangulation):
         '''
         popup window for map concentration
         '''
-        self.canvas = mapcanvas.MapCanvas(triangles)
+        self.canvas = mapcanvas.MapCanvas(triangulation)
         self.canvas.setGeometry(QRect(100, 100, 700, 700))
         self.canvas.show()
         

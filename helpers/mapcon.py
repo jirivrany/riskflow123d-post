@@ -85,15 +85,11 @@ def get_triangles_surface(mesh_elements, nodes, dict_concentrations, sim_time):
     
     return triangles
 
-def draw_map(triangles, options):
+
+def prepare_triangulation(triangles):
     '''
-    get the triangle tuple (concentration, triangle] prepared before
-    and draw the map of triangles
-    options :
-    "map_format": "svg",
-    "map_file": "../../mapa"
+    get the triangles and prepare pyplot data from them
     '''
-    
     conc_list = []
     grid = []
     tri_list = []
@@ -108,16 +104,34 @@ def draw_map(triangles, options):
         
     xy = np.asarray(grid)
     
-    x = xy[:,0]
-    y = xy[:,1]
+    x_np = xy[:,0]
+    y_np = xy[:,1]
     
     triangles = np.asarray(tri_list)
     
     zfaces = np.asarray(conc_list)
     
+    return {'x_np': x_np,
+            'y_np' : y_np,
+            'triangles': triangles,
+            'zfaces': zfaces} 
+
+def draw_map(triangulation, options):
+    '''
+    get the triangle tuple (concentration, triangle] prepared before
+    and draw the map of triangles
+    options :
+    "map_format": "svg",
+    "map_file": "../../mapa"
+    '''
+    
     plt.figure()
     plt.gca().set_aspect('equal')
-    plt.tripcolor(x, y, triangles, facecolors=zfaces, edgecolors='k')
+    plt.tripcolor(triangulation['x_np'],
+                  triangulation['y_np'],
+                  triangulation['triangles'],
+                  facecolors=triangulation['zfaces'],
+                  edgecolors='k')
     plt.colorbar()
     plt.title('Map of concentrations')
     plt.xlabel('mesh X coord')
