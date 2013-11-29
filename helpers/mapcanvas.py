@@ -3,7 +3,7 @@ Created on 28 Nov 2013
 
 @author: albert
 '''
-from PyQt4.QtGui import QWidget, QPainter
+from PyQt4.QtGui import QWidget, QSizePolicy
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
@@ -21,7 +21,9 @@ class MapCanvas(QWidget):
         self.fig, self.axes = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
-        
+        self.canvas.setSizePolicy(QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        self.canvas.updateGeometry()
         
         
     def paintEvent(self, e):
