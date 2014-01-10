@@ -562,6 +562,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             filtered_dict = self.result_elements    
         
         for xkey, xval in filtered_dict.items():
+            self.draw_routine(xkey, xval, gdir)
+            
+        self.messenger('all charts sucessfully created')
+        
+    def draw_routine(self, xkey, xval, gdir):
+        '''
+        Test minimal conc and draw chart if values are greater
+        then given minimum.
+        '''    
+        min_con = float(self.edit_chart_min_conc.text())
+        
+        if max(xval.values()) > min_con:
+        
             disp = grafLinear.fill_up_zeros(self.result_times, xval)
             data = {'disp': disp, 'times': self.result_times}
             settings = {
@@ -573,9 +586,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         }
             
             grafLinear.draw_chart(data, settings)
-            self.messenger('chart for element {} created'.format(xkey))
+            self.messenger('Chart for element {} created'.format(xkey))
+        
+        else:
+            self.messenger('Maximal concentration for element {} is bellow given value.'.format(xkey))
             
-        self.messenger('all charts sucessfully created')
+            
         
     def create_tables(self):
         '''Create csv table with results'''
@@ -707,17 +723,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.work_dir = str(tmp)
             self.identify_problem_type() 
         else: 
-            self.messenger('ERROR: Selected directory does not contain problem.type file!')
+            self.messenger('Directory does not contain problem.type file! Assuming basic problem.')
+            self.analyse_basic_problem()
         
     def identify_problem_type(self):
         '''
         search dir for file problem.type 
-        fails if file not exist
+        fail if file not exist
         '''
         try:
             rfile = open(self.work_dir + '/problem.type')
         except IOError:
-            self.messenger('ERROR: failed to open problem.type file') 
+            self.messenger('Failed to open problem.type file')
+            self.analyse_basic_problem()
         else:
             istr = rfile.read()
             if istr.strip() in IDSDICT.keys():
