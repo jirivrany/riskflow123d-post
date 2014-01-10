@@ -5,6 +5,13 @@ Created on 16.11.2011
 '''
 import os.path
 
+def value_set(dic, key):
+    '''
+    test if value is in dict and is not empty
+    '''
+    if dic.has_key(key) and dic[key]:
+        return True
+
 def format_time(given_time):
     '''
     converts given number to time string

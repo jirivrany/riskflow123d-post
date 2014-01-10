@@ -8,15 +8,19 @@ from PyQt4.QtGui import QWidget, QSizePolicy, QVBoxLayout
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 import matplotlib.pyplot as plt
+from ruzne import value_set
 
 
 class MapCanvas(QWidget):
-    def __init__(self, triangulation, parent=None):
+    def __init__(self, triangulation, options, parent=None):
         super(MapCanvas, self).__init__(parent)
         self.triang = triangulation
         self.first_run = True
         
-        self.title = 'Map of concentrations'
+        self.lab_x = options['xlabel'] if value_set(options, 'xlabel') else 'mesh X coord'
+        self.lab_y = options['ylabel'] if value_set(options, 'ylabel') else 'mesh Y coord'
+        self.title = options['title'] if value_set(options, 'title') else 'Map of concentrations'
+        
         self.setWindowTitle(self.title)
         self.create_main_frame()
         self.on_draw()
@@ -44,6 +48,9 @@ class MapCanvas(QWidget):
         '''
         draw the chart
         '''
+        
+        
+        
         self.axes.clear()        
         self.axes.set_aspect('equal')
         tri = self.axes.tripcolor(self.triang['x_np'],
@@ -52,8 +59,8 @@ class MapCanvas(QWidget):
                   facecolors=self.triang['zfaces'],
                   edgecolors='k')
         self.axes.set_title(self.title)
-        self.axes.set_xlabel('mesh X coord')
-        self.axes.set_ylabel('mesh Y coord')
+        self.axes.set_xlabel(self.lab_x)
+        self.axes.set_ylabel(self.lab_y)
         if self.first_run:
             self.fig.colorbar(tri)
             self.first_run = False

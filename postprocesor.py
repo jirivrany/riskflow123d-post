@@ -124,7 +124,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             
         map_options = {
             "map_format": "png",
-            "map_file": "{}/mapa.png".format(self.work_dir)
+            "map_file": "{}/mapa.png".format(self.work_dir),
+            'xlabel' : str(self.edit_chart_x_text.text()),
+            'ylabel' : str(self.edit_chart_y_text.text()),
+            'title' : str(self.edit_chart_title_text.text())
         }
         
         sim_time = str(self.maps_sim_time_select.currentText())
@@ -163,7 +166,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         popup window for map concentration
         '''
-        self.canvas = mapcanvas.MapCanvas(triangulation)
+        map_options = {
+            'xlabel' : str(self.edit_chart_x_text.text()),
+            'ylabel' : str(self.edit_chart_y_text.text()),
+            'title' : str(self.edit_chart_title_text.text())
+        }
+        
+        
+        self.canvas = mapcanvas.MapCanvas(triangulation, map_options)
         self.canvas.setGeometry(QRect(100, 100, 700, 700))
         self.canvas.show()
         

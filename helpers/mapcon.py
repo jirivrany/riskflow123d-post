@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import toptriangle
 import section
+from ruzne import value_set
 
 def dump_test(data):
     '''
@@ -124,6 +125,10 @@ def draw_map(triangulation, options):
     "map_format": "svg",
     "map_file": "../../mapa"
     '''
+    lab_x = options['xlabel'] if value_set(options, 'xlabel') else 'mesh X coord'
+    lab_y = options['ylabel'] if value_set(options, 'ylabel') else 'mesh Y coord'
+    lab_tit = options['title'] if value_set(options, 'title') else 'Map of concentrations'
+    
     
     plt.figure()
     plt.gca().set_aspect('equal')
@@ -133,9 +138,9 @@ def draw_map(triangulation, options):
                   facecolors=triangulation['zfaces'],
                   edgecolors='k')
     plt.colorbar()
-    plt.title('Map of concentrations')
-    plt.xlabel('mesh X coord')
-    plt.ylabel('mesh Y coord')
+    plt.title(lab_tit)
+    plt.xlabel(lab_x)
+    plt.ylabel(lab_y)
     
     plt.savefig(options["map_file"], format=options["map_format"])               
             
