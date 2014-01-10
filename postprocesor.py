@@ -553,7 +553,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         for xkey, xval in filtered_dict.items():
             disp = grafLinear.fill_up_zeros(self.result_times, xval)
-            grafLinear.draw_chart(xkey, self.result_times, disp, gdir)
+            data = {'disp': disp, 'times': self.result_times}
+            settings = {
+                        'xkey' : xkey, 
+                        'where': gdir,
+                        'xlabel': str(self.edit_chart_x_text.text()),
+                        'ylabel' : str(self.edit_chart_y_text.text()),
+                        'title' : str(self.edit_chart_title_text.text())
+                        }
+            
+            grafLinear.draw_chart(data, settings)
             self.messenger('chart for element {} created'.format(xkey))
             
         self.messenger('all charts sucessfully created')

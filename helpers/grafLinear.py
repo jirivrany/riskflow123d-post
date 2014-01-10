@@ -31,13 +31,28 @@ def list_filter(dct, flt):
             temp[key] = dct[key]
     return temp
 
-def draw_chart(xkey, times, disp, where):
-    plot(times, disp, '-', lw=2)
-    xlabel('time (s)')
-    ylabel('concentration')
-    title('graph of concentration for element {}'.format(xkey))
+def value_set(dic, key):
+    '''
+    test if value is in dict and is not empty
+    '''
+    if dic.has_key(key) and dic[key]:
+        return True
+    
+
+def draw_chart(data, settings):
+    '''
+    draw png file 
+    '''
+    lab_x = settings['xlabel'] if value_set(settings, 'xlabel') else 'time (s)'
+    lab_y = settings['ylabel'] if value_set(settings, 'ylabel') else 'concentration'
+    lab_tit = settings['title'] if value_set(settings, 'title') else 'concentration'
+    
+    plot(data['times'], data['disp'], '-', lw=2)
+    xlabel(lab_x)
+    ylabel(lab_y)
+    title(u'graph of {} for element {}'.format(lab_tit, settings['xkey']))
     grid(True)
     axes()
-    savefig('{}element_{}'.format(where,xkey))
+    savefig('{}element_{}'.format(settings['where'], settings['xkey']))
     close()
     
