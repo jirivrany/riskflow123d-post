@@ -223,6 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         float_validator = QDoubleValidator()
         self.edit_merge_minval.setValidator(float_validator)
         self.maps_section_height.setValidator(float_validator)
+        self.edit_chart_min_conc.setValidator(float_validator)
         
         self.action_Open.triggered.connect(self.open_task_dir)
         self.action_Basic_problem.triggered.connect(self.analyse_basic_problem)
