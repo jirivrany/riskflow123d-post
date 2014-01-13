@@ -22,7 +22,7 @@ def read_result(fname):
     
     return elems        
         
-def read(bcd_name,msh_name):
+def read(bcd_name, msh_name):
     """
     Read a Flow .bcd file for surface elements
     need a .msh file to apply 3D elements filtering
@@ -63,7 +63,7 @@ def read(bcd_name,msh_name):
         
     return __filter_3d(elements, msh_name)
 
-def __filter_3d(elements,msh_name):
+def __filter_3d(elements, msh_name):
     '''apply filter for 3d elements only'''
     msh = mesh.Mesh()
     msh.read(msh_name)
@@ -71,7 +71,7 @@ def __filter_3d(elements,msh_name):
     three_dee = [elmid for elmid, elmtup in msh.elements.items() if elmtup[0] == 4]
     return [elmid for elmid in elements if elmid in three_dee]
 
-def write(fname,elements):
+def write(fname, elements):
     '''
     write list of elements to disk 
     output format / single element per line

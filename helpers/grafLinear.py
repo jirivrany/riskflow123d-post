@@ -5,7 +5,7 @@ Created on 18.1.2012
 '''
 from matplotlib import use
 use('Agg')
-from matplotlib.pyplot import plot, xlabel, ylabel, title, grid, axes, savefig, close
+import matplotlib.pyplot as plt
 from ruzne import value_set
 
 def fill_up_zeros(times, xval):
@@ -42,12 +42,13 @@ def draw_chart(data, settings):
     lab_y = settings['ylabel'] if value_set(settings, 'ylabel') else 'concentration'
     lab_tit = settings['title'] if value_set(settings, 'title') else 'concentration'
     
-    plot(data['times'], data['disp'], '-', lw=2)
-    xlabel(lab_x)
-    ylabel(lab_y)
-    title(u'graph of {} for element {}'.format(lab_tit, settings['xkey']))
-    grid(True)
-    axes()
-    savefig('{}element_{}'.format(settings['where'], settings['xkey']))
-    close()
+    plt.clf()
+    plt.plot(data['times'], data['disp'], '-', lw=2)
+    plt.xlabel(lab_x)
+    plt.ylabel(lab_y)
+    plt.title(u'graph of {} for element {}'.format(lab_tit, settings['xkey']))
+    plt.grid(True)
+    plt.axes()
+    plt.savefig('{}element_{}'.format(settings['where'], settings['xkey']))
+    plt.close()
     

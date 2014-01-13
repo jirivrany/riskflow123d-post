@@ -39,6 +39,37 @@ def get_triangle_from_node_coords(elem, nodes):
     
     return toptriangle.get_triangle(*node_coords)
 
+
+def get_surface_triangles_from_bcd(bcd_name, slist):
+    """
+    Read a Flow .bcd file 
+    search for surface elements
+    returns list of surface elements with points on plane side
+    """
+    elements = []
+    readmode = 0
+    typ = 0
+    where  = 0
+    height_limit = 10
+    
+    with open(bcd_name, "r") as mshfile:
+        for line in mshfile:
+            line = line.strip()
+            if line.startswith('$'):
+                if line == '$BoundaryConditions':
+                    readmode = 1
+                else:
+                    readmode = 0
+            elif readmode:
+                columns = line.split()
+                if len(columns) > 5:
+                    #first column is type of condition
+                    element_id = int(columns[4])
+                    if element_id in slist:
+                        elements.append([element_id, int(columns[5])])
+                         
+    return elements                     
+
 def get_triangle_from_cut(elem, nodes, height):
     '''
     get the triangle from tetrahedra cut
@@ -72,7 +103,7 @@ def get_triangles_section(mesh_elements, nodes, dict_concentrations, height, sim
     
     return zip(conc, triangles)        
 
-def get_triangles_surface(mesh_elements, nodes, dict_concentrations, sim_time):
+def get_triangles_surface(mesh_elements, nodes, dict_concentrations, sim_time, bcd_file):
     '''
     transform the mesh coordinates to the list 
     of tuples (concentration, triangle)
@@ -144,7 +175,14 @@ def draw_map(triangulation, options):
     
     plt.savefig(options["map_file"], format=options["map_format"])               
             
-    
+def test_surface_nodes():
+    bcd_name = '/home/albert/data/risk_flow/riskflow/test_postproc/master/mm.bcd'
+    surface = '/home/albert/data/risk_flow/riskflow/test_postproc/master/surface.txt'
+    with open(surface) as surf:
+        slist = [int(x) for x in surf.readlines()]
+        
+    elems = get_surface_triangles_from_bcd(bcd_name, slist)
+    print elems    
 
 if __name__ == '__main__':
-    pass
+    test_surface_nodes()

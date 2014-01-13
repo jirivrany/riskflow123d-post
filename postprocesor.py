@@ -81,6 +81,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.solutions = None
         self.problem_type = None
         self.canvas = None
+        self.bcd_file = ''
         #setup app
         self.setup = None
         self._load_setup()
@@ -137,7 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if self.maps_check_nonzero.isChecked():
                 vals = self.__remove_zeros_from_mesh_list(vals)
             self.messenger("Drawing map of concetration to file...")
-            triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements, sim_time)
+            triangles = mapcon.get_triangles_surface(vals, self.msh.nodes, self.result_elements, sim_time, self.bcd_file)
         elif self.maps_radio_section.isChecked():
             try:
                 height = float(self.maps_section_height.text())
@@ -571,8 +572,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         Test minimal conc and draw chart if values are greater
         then given minimum.
-        '''    
-        min_con = float(self.edit_chart_min_conc.text())
+        '''
+        min_con = float(self.edit_chart_min_conc.text()) if self.edit_chart_min_conc.text() else 0
         
         if max(xval.values()) > min_con:
         
@@ -813,6 +814,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             fname_bcd = wdir[self.problem_type] + '/' + self.file_dict['Boundary']
             fname_msh = wdir[self.problem_type] + '/' + self.file_dict['Mesh']
+            self.bcd_file = fname_bcd
             self.surface_elements = surface.read(fname_bcd, fname_msh)
             surface.write(fname, self.surface_elements)
                 
