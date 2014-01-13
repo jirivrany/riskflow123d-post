@@ -802,8 +802,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         load surface elems using surface module
         first try to open prepared file, in case of file create a new one using surface module
         '''
-        wdir = {'basic' : self.work_dir, 'compare' : self.master_work_dir} 
+        wdir = {'basic' : self.work_dir, 'compare' : self.master_work_dir}
         
+        fname_bcd = wdir[self.problem_type] + '/' + self.file_dict['Boundary'] 
+        self.bcd_file = fname_bcd
+            
         
         if file_name is None: 
             fname = self.master_work_dir + FNAME_SURF
@@ -812,9 +815,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if path.isfile(fname):
             self.surface_elements = surface.read_result(fname)
         else:
-            fname_bcd = wdir[self.problem_type] + '/' + self.file_dict['Boundary']
             fname_msh = wdir[self.problem_type] + '/' + self.file_dict['Mesh']
-            self.bcd_file = fname_bcd
             self.surface_elements = surface.read(fname_bcd, fname_msh)
             surface.write(fname, self.surface_elements)
                 

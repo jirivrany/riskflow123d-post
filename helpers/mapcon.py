@@ -39,6 +39,16 @@ def get_triangle_from_node_coords(elem, nodes):
     
     return toptriangle.get_triangle(*node_coords)
 
+def get_surface_triangle_from_node_coords(elem, nodes, filter_out):
+    '''
+    get the node x,y coordinates from node structure
+    node has 4 points in 3D - we need 3 of it, composing largest triangle
+    '''
+    index = [0, 1, 2, 3]
+    index.remove(filter_out)
+    node_coords = [tuple(nodes[node_id][:2]) for node_id in elem[2]]
+    return [node_coords[i] for i in index]
+    
 
 def get_surface_triangles_from_bcd(bcd_name, slist):
     """
@@ -46,7 +56,7 @@ def get_surface_triangles_from_bcd(bcd_name, slist):
     search for surface elements
     returns list of surface elements with points on plane side
     """
-    elements = []
+    elements = {}
     readmode = 0
     typ = 0
     where  = 0
@@ -66,7 +76,7 @@ def get_surface_triangles_from_bcd(bcd_name, slist):
                     #first column is type of condition
                     element_id = int(columns[4])
                     if element_id in slist:
-                        elements.append([element_id, int(columns[5])])
+                        elements[element_id] = int(columns[5])
                          
     return elements                     
 
@@ -109,14 +119,14 @@ def get_triangles_surface(mesh_elements, nodes, dict_concentrations, sim_time, b
     of tuples (concentration, triangle)
     only 3D elements are valid
     '''
+    elements = get_surface_triangles_from_bcd(bcd_file, mesh_elements)
             
     triangles = [ (conc_at_time(elid, sim_time, dict_concentrations), 
-                   get_triangle_from_node_coords(elem, nodes)) 
+                   get_surface_triangle_from_node_coords(elem, nodes, elements[elid])) 
                  for elid, elem in mesh_elements.iteritems() 
                  if elem[0] > 2]
     
     return triangles
-
 
 def prepare_triangulation(triangles):
     '''
