@@ -44,8 +44,8 @@ def draw_chart(data, settings):
     
     plt.clf()
     plt.plot(data['times'], data['disp'], '-', lw=2)
-    plt.xlabel(lab_x)
-    plt.ylabel(lab_y)
+    plt.xlabel(u'{}'.format(lab_x))
+    plt.ylabel(u'{}'.format(lab_y))
     plt.title(u'graph of {} for element {}'.format(lab_tit, settings['xkey']))
     plt.grid(True)
     plt.axes()
