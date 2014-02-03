@@ -4,8 +4,9 @@ __date__ ="$10.8.2011 13:37:40$"
 
 import re
 import basicParser
-import flowFileTypes
 import os.path
+
+import inspect
 
 
 orderOfMtr = (
@@ -27,12 +28,34 @@ class EmptyListException(BaseException):
     pass
 
 
+class Matdata(object):
+    
+    def __init__(self):
+        self.id = 0
+        self.type = 0
+        self.type_spec = 0.0
+        self.storativity = []
+        self.sorption = []
+        self.dualporosity = []
+        self.sorptionfraction = []
+        self.geometry = []
+        self.reactions = []
+        
+    def __str__(self):
+        boring = dir(type('dummy', (object,), {}))
+        it = [item
+            for item in inspect.getmembers(self)
+            if item[0] not in boring]
+        return str(it)
+
+
+
 class Material(basicParser.BasicParser):
     '''flow.ini file parser'''
     def __init__(self):
         '''open the ini file and creates dictionary with values of interest'''
         basicParser.BasicParser.__init__(self)
-        self.material = flowFileTypes.Material
+        self.material = Matdata
         self.values = {}
         self.file = None
         self.attribute = False
