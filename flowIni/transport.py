@@ -43,7 +43,7 @@ def worker(input_queue, done_queue):
         done_queue.put(time.time() - start_time)
 
         
-def read_transport(fname,suma=False):
+def read_transport(fname, suma=False):
     """
     Read a Flow .pos file.
     @param: suma - set True if sum of concentration has to be computed too
