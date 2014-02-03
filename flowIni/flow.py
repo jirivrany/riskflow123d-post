@@ -1,71 +1,109 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
 # coding: utf-8
-__author__="albert"
-__date__ ="$10.8.2011 13:37:40$"
+'''
+Parser for Flow.ini file. Works with Flow 1.6.x format.
+'''
 
-import os.path
+__author__ = "Jiri Vrany"
+__date__  = "$23.10.2012$"
+
+
 from iniparse import INIConfig 
 
-dictOfExtensions = {
-                    'Input':{'Mesh':'msh','Material':'mtr','Boundary':'bcd','Neighbouring':'ngh'}, 
-                    'Transport' :{'Concentration':'tic','Transport_BCD':'tbc','Transport_out':'pos'},
+EXTENSIONS_DICT = {
+                    'Input':{ 'Mesh':'msh',
+                              'Material':'mtr', 
+                              'Boundary':'bcd', 
+                              'Neighbouring':'ngh'},
+                    
+                    'Transport' :{'Concentration':'ict', 
+                                  'Transport_BCD':'bct', 
+                                  'Transport_out':'pos'},
                     }
 
-dictOfLabels = {'Mesh':'msh','Material':'mtr','Boundary':'bcd','Neighbouring':'ngh', 'Concentration':'tic','Transport_BCD':'tbc','Transport_out':'pos'}
+LABELS_DICT = {'Mesh':'msh', 
+               'Material':'mtr', 
+               'Boundary':'bcd', 
+               'Neighbouring':'ngh', 
+               'Concentration':'ict', 
+               'Transport_BCD':'bct', 
+               'Transport_out':'pos'}
                     
 
-def openFile(fileName):
-        '''@param filenName
-        Try open a file, throws exception if file not exist'''
-        try:
-            ff = open(fileName)
-            return ff
-        except IOError:
-            return None
+def open_file(file_name):
+    '''@param filenName
+    Try open a file, throws exception if file not exist'''
+    try:
+        wfile = open(file_name)
+        return wfile
+    except IOError:
+        return None
         
-def getDictFromFile(fileName):
-    '''@param fileName
-       @return Dictionary of values'''
-    f = openFile(fileName)
-    va = parse(f)
-    f.close
-    return va
-
-def parser(fileObject):
+def get_txt_from_file(fname):
     '''
-    @param: fileObject - opened file
+    @param fname / get a text from inifile
+    '''
+    fini = open_file(fname)
+    txt = fini.read()
+    fini.close()
+    return txt
+            
+        
+def get_dict_from_file(fname):
+    '''@param fname
+       @return Dictionary of values'''
+    data = open_file(fname)
+    vals = parse(data)
+    data.close()
+    return vals
+
+
+def get_substances_from_file(fname):
+    '''@param fname
+       @return Dictionary of values'''
+    data = open_file(fname)
+    vals = parse_substances(data)
+    data.close()
+    return vals
+
+
+def parser(opened_file):
+    '''
+    @param: opened_file - opened file
     @return: iniparse object 
     '''
     try:
-        par = INIConfig(fileObject)
+        par = INIConfig(opened_file)
         return par
     except IOError:
-        pass
+        print "failed to handle file"
 
-def parse(fileObject):
+def parse(opened_file):
     '''search a file for values
-    @param fileObject - opened file
+    @param opened_file - opened file
     @return vals - {} of values
     '''
     values = {} 
-    pa = parser(fileObject)
-    for k in dictOfExtensions.keys():
-        for j in dictOfExtensions[k].keys():
-            values[j] = pa[k][j]
+    pars = parser(opened_file)
+    for key in EXTENSIONS_DICT.keys():
+        for in_key in EXTENSIONS_DICT[key].keys():
+            values[in_key] = pars[key][in_key]
      
     return values       
 
-if __name__ == '__main__':
-    #fileName = '../../../data/01_steady_flow_123d/flow_matis.ini'
-    fileName = '../../../data/01/flow_t.ini'
-    adr = os.path.dirname(fileName)
-    print adr
-    slovnik = getDictFromFile(fileName)
-    for key,name in slovnik.items():
-        fname = adr + os.sep +name
-        test = openFile(fname)
-        if test:
-            print '%s is OK' % key
-        else:
-             print "failed to open %s file" % key
+def parse_substances(opened_file):
+    '''search a file for values
+    @param opened_file - opened file
+    @return vals - {} of values
+    '''
+    values = {
+              'Sorption': False,
+              'Dual_porosity': False,
+              'N_substances': 0,
+              'Substances': None
+              } 
+    pars = parser(opened_file)
+    for key in values.keys():
+        values[key] = pars['Transport'][key]
+     
+    return values       
+

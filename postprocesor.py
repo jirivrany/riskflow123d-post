@@ -82,6 +82,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.problem_type = None
         self.canvas = None
         self.bcd_file = ''
+        self.substances = None
         #setup app
         self.setup = None
         self._load_setup()
@@ -762,7 +763,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.flowini_file_master = list_of_files[0].strip()
             fname = self.master_work_dir + self.flowini_file_master
-            self.file_dict = flow.getDictFromFile(fname) 
+            self.file_dict = flow.get_dict_from_file(fname)
+            self.substances = flow.get_substances_from_file(fname)
+            print self.substances 
             return True
 
     def _load_setup(self):
