@@ -48,50 +48,124 @@ def read_transport(fname, suma=False):
     Read a Flow .pos file.
     @param: suma - set True if sum of concentration has to be computed too
     """
+    try:
+        with open(fname, "r") as mshfile:
+            data = mshfile.readlines()
+    except IOError:
+        print 'Error - failed to open file %s ' % fname
+    else:
+        #in result times, elements, elems_suma
+        result = parse_single_substances(data, suma)
+        if suma:
+            return result[0], result[1], result[2]
+        else:
+            return result[0], result[1]
+        
+    
+def parse_single_substances(data_lines, suma=False):
+    '''
+    parses transport data for classic task / only one substance
+    '''
     elements = {}
     times = []
     elems_suma = {}
     readmode = 0
-    curent_time = 0
-    try:
-        mshfile = open(fname, "r")
-    except IOError:
-        print 'Error - failed to open file %s ' % fname
-    else:        
-        for line in mshfile:
-            line = line.strip()
-            if line.startswith('$'):
-                if line == '$ElementData':
-                    readmode = 1
-                    counter = 0
-                else:
-                    readmode = 0
-            elif readmode:
-                if counter < 9: 
-                    counter += 1
-                columns = line.split()
-                if len(columns) > 1 and counter > 7:
-                    key = int(columns[0])
-                    val = float(columns[1])
-                    if val > 0:
-                        if elements.has_key(key): 
-                            elements[key][curent_time] = val
-                            if suma:
-                                elems_suma[key] += val
-                        else: 
-                            elements[key] = {curent_time:val}
-                            if suma:
-                                elems_suma[key] = val
-                        
-                elif len(columns) == 1 and counter == 4:
-                    curent_time = float(columns[0])
-                    times.append(curent_time)
+    curent_time = 0  
+    
+    for line in data_lines:
+        line = line.strip()
+        if line.startswith('$'):
+            if line == '$ElementData':
+                readmode = 1
+                counter = 0
+            else:
+                readmode = 0
+        elif readmode:
+            if counter < 9: 
+                counter += 1
+            columns = line.split()
+            if len(columns) > 1 and counter > 7:
+                key = int(columns[0])
+                val = float(columns[1])
+                if val > 0:
+                    if elements.has_key(key): 
+                        elements[key][curent_time] = val
+                        if suma:
+                            elems_suma[key] += val
+                    else: 
+                        elements[key] = {curent_time:val}
+                        if suma:
+                            elems_suma[key] = val
+                    
+            elif len(columns) == 1 and counter == 4:
+                curent_time = float(columns[0])
+                times.append(curent_time)
                     
     if suma:
         return times, elements, elems_suma
     else:
-        return times, elements
+        return times, elements  
 
+
+def parse_multiple_substances(substances, data_lines, suma=False):
+    '''
+    parses transport data for multiple substances task 
+    at each simulation time there are @substances number of results
+    '''
+    all_subs = {}
+    times = set()
+    all_sumas = {}
+    readmode = 0
+    current_time = 0
+    current_sub = ''  
+    
+    for line in data_lines:
+        line = line.strip()
+        if line.startswith('$'):
+            if line == '$ElementData':
+                readmode = 1
+                counter = 0
+            else:
+                readmode = 0
+        elif readmode:
+            if counter < 9: 
+                counter += 1
+            columns = line.split()
+            if len(columns) > 1 and counter > 7:
+                key = int(columns[0])
+                val = float(columns[1])
+                if val > 0:
+                    if all_subs[current_sub].has_key(key): 
+                        all_subs[current_sub][key][current_time] = val
+                        if suma:
+                            all_sumas[current_sub][key] += val
+                    else: 
+                        all_subs[current_sub][key] = {current_time:val}
+                        if suma:
+                            all_sumas[current_sub][key] = val
+                    
+            elif len(columns) == 1 and counter == 4:
+                #4th row after element is simulation time
+                current_time = float(columns[0])
+                times.add(current_time)
+            
+            elif len(columns) == 1 and counter == 2:
+                #2nd row after element is substantion name
+                current_sub = columns[0][1:-1]
+                if current_sub not in all_subs:
+                    all_subs[current_sub] = {}
+                
+                if suma and current_sub not in all_sumas:
+                    all_sumas[current_sub] = {}
+                        
+                    
+                
+               
+    times = sorted(times)                
+    if suma:
+        return times, all_subs, all_sumas
+    else:
+        return times, all_subs  
    
 
 def parse_task_dirs(dirname, search_for='ini'):
