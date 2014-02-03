@@ -27,6 +27,20 @@ LABELS_DICT = {'Mesh':'msh',
                'Concentration':'ict', 
                'Transport_BCD':'bct', 
                'Transport_out':'pos'}
+
+def change_paths_in_file(file_name, new_dir_name):
+    '''
+    accepts list of changes
+    @param fname: file name to save   
+    '''
+    with open(file_name, 'r') as confile:
+        current_config = INIConfig(confile) 
+        for dic_key in EXTENSIONS_DICT.keys():
+            for iner_key in EXTENSIONS_DICT[dic_key].keys():
+                current_config[dic_key][iner_key] = new_dir_name + '/' + current_config[dic_key][iner_key]
+    
+    with open(file_name, 'w') as confile:
+        print >> confile, current_config
                     
 
 def open_file(file_name):

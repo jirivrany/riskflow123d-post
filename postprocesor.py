@@ -66,7 +66,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logovat = False
         self.flowini_file_master = ''
         self.flowini_data = ''
-        self.file_dict = ''
+        self.file_dict = None
         self.displayed_mesh_list = {}
         self.displayed_mtr_list = {}
         self.result_elements = None
@@ -722,8 +722,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''SetUP output using Qfiledialog'''        
         adr = "."
         tmp = QFileDialog.getExistingDirectory(self, "Open output directory", adr, options=QFileDialog.ShowDirsOnly)
+        self.work_dir = str(tmp)
         if ruzne.isit_task_folder(tmp):
-            self.work_dir = str(tmp)
             self.identify_problem_type() 
         else: 
             self.messenger('Directory does not contain problem.type file! Assuming basic problem.')

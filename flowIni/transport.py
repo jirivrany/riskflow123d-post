@@ -13,6 +13,9 @@ import os
 import time
 import getopt
 import sys
+import shutil
+
+import flow
 
 FNAME_TIME = 'times'
 FNAME_ELEMS = 'elements_concentration'
@@ -30,8 +33,7 @@ def worker(input_queue, done_queue):
     for reseni in iter(input_queue.get, 'STOP'):
         start_time = time.time() 
         #grabs host from queue
-        klic, soubor = os.path.split(reseni)
-        del(soubor)
+        klic, _s = os.path.split(reseni)
         times, elements, suma = read_transport(reseni, True)
         fname = klic + '/' + FNAME_ELEMS
         save_vysledek(fname, elements)
@@ -193,6 +195,25 @@ def get_name_from_ini_file(ininame):
     else:
         pars = INIConfig(file_handler)
         return pars['Transport']['Transport_out']
+
+def create_ini_file_for_substance(ininame, substance):
+    '''
+    copy inifile to subfolder
+    '''
+    dir_name, file_name = os.path.split(ininame)
+    dir_name = os.path.join(dir_name, substance)
+    file_name = substance + '_' + file_name
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+        
+    new_file_name = os.path.join(dir_name, file_name)
+    shutil.copy2(ininame, new_file_name)
+    
+    print flow.change_paths_in_file(new_file_name, '..')    
+        
+    
+
+
 
         
 def get_result_files(dirname):

@@ -85,8 +85,14 @@ def test_read_multiple_subs():
                          'A_mobile_[M/L^3]': {1: 2.0, 2: 3.0},
                          'B_mobile_[M/L^3]': {1: 5.0, 2: 11.0}
                          }
-
+    
+def test_change_ini_file():
+    ininame = '/home/albert/data/risk_flow/test_data/2substance/flow.ini'
+    transport.create_ini_file_for_substance(ininame, 'A')
+    ininame2 = '/home/albert/data/risk_flow/test_data/2substance/A/A_flow.ini'
+    assert transport.get_name_from_ini_file(ininame2) == '../krychle_t.pos'
+    
 if __name__ == '__main__':
-    test_read_single_subs()
+    test_change_ini_file()
 
     
