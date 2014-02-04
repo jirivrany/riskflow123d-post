@@ -82,7 +82,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.problem_type = None
         self.canvas = None
         self.bcd_file = ''
-        self.substances = None
+        self.substances = False
         #setup app
         self.setup = None
         self._load_setup()
@@ -461,7 +461,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progress_processing.setMinimum(0)
         self.progress_processing.setValue(0)
         
-        self.tasks = transport.get_result_files(self.work_dir)
+        
+        
+        self.tasks = transport.get_result_files(self.work_dir, self.substances)
         n_tas = len(self.tasks)
         
         self.solutions = transport.parse_task_dirs(self.work_dir, FNAME_ELEMS)
@@ -475,7 +477,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.button_process_all.setText('All')    
         
         msg = "Found {} tasks to analyze. That will take approx. {}\n".format(n_tas, ruzne.format_time(n_tas*4))
-        msg += "{} tasks was already processed (compressed file found), {} still need processing".format(n_sols, n_tas-n_sols)
+        msg += "{} tasks was already processed (compressed file found), {} still need processing\n".format(n_sols, n_tas-n_sols)
+        if self.substances and n_sols > 0:
+            msg += "If computing with multiple substances you can now close this primary task and open result for single substance in subfolder."
         self.label_processing_text.setText(msg)
         
         self.progress_processing.setMaximum(n_tas*4)
@@ -487,10 +491,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         action for button_process_all
         takes all tasks in work_dir to process
         '''
+     
         if not self.tasks:
-            self.tasks = transport.get_result_files(self.work_dir)
+            self.tasks = transport.get_result_files(self.work_dir, self.substances)
         
-        self.messenger('Processing data, it may take a while')    
+        self.messenger('Processing data, it may take a while')
         self._analyze_data_routine(self.tasks)
         self.messenger('Processing successfully finished', 300)
         self._data_dialog()
@@ -501,13 +506,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         takes only unprocessed tasks in work_dir to process
         '''
         if not self.tasks:
-            self.tasks = transport.get_result_files(self.work_dir)
+            self.tasks = transport.get_result_files(self.work_dir, self.substances)
         if not self.solutions:
             self.solutions = transport.parse_task_dirs(self.work_dir, FNAME_ELEMS)
             
         dir1 = [path.split(sol)[0] for sol in self.solutions]
         dir2 = [path.split(sol)[0] for sol in self.tasks]
-        unproc_list = [transport.get_result_files(i)[0] for i in dir2 if i not in dir1]
+        unproc_list = [transport.get_result_files(i, self.substances)[0] for i in dir2 if i not in dir1]
         
         self.messenger('Processing data, it may take a while')
         self._analyze_data_routine(unproc_list)
@@ -531,7 +536,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             task_queue.put(result)
         #Start worker processes
         for _11 in range(nr_of_proc):
-            Process(target=transport.worker, args=(task_queue, done_queue)).start()
+            Process(target=transport.worker, args=(task_queue, done_queue, self.substances)).start()
         # Get and print results
         nval = 0
         for _12 in range(len(task_list)):
@@ -565,6 +570,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             filtered_dict = self.result_elements    
         
         for xkey, xval in filtered_dict.items():
+            print xkey, xval #DEBUG
             self.draw_routine(xkey, xval, gdir)
             
         self.messenger('all charts sucessfully created')
@@ -764,8 +770,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.flowini_file_master = list_of_files[0].strip()
             fname = self.master_work_dir + self.flowini_file_master
             self.file_dict = flow.get_dict_from_file(fname)
-            self.substances = flow.get_substances_from_file(fname)
-            print self.substances 
+            subs = flow.get_substances_from_file(fname)
+            if subs['N_substances'] > 1:
+                self.substances = True
+                
             return True
 
     def _load_setup(self):

@@ -74,7 +74,7 @@ def test_read_single_subs():
     
 def test_read_multiple_subs():
     data = data_sub.split('\n')
-    result = transport.parse_multiple_substances(2, data, True) 
+    result = transport.parse_multiple_substances(data, True) 
     assert result[0] == [100.0]
     assert result[1] == {
                          'A_mobile_[M/L^3]': {1: {100.0: 2.0}, 2: {100.0: 3.0}},
@@ -92,7 +92,12 @@ def test_change_ini_file():
     ininame2 = '/home/albert/data/risk_flow/test_data/2substance/A/A_flow.ini'
     assert transport.get_name_from_ini_file(ininame2) == '../krychle_t.pos'
     
+def test_parse_dir():
+    ininame = '/home/albert/data/risk_flow/substance/pokus_ndir'
+    soubory = transport.get_result_files(ininame, True)
+    transport.read_process_substances(soubory, 'json')
+    
 if __name__ == '__main__':
-    test_change_ini_file()
+    test_parse_dir()
 
     

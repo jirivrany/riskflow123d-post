@@ -22,7 +22,7 @@ FNAME_ELEMS = 'elements_concentration'
 FNAME_SUMA = 'conc_suma'
 FNAME_EXT = {'json':'json', 'pickle':'pck'}
 
-def worker(input_queue, done_queue):
+def worker(input_queue, done_queue, substances=False):
     '''
     Worker process - takes data from input, saves results to disk
     and puts time of computation to output
@@ -33,19 +33,15 @@ def worker(input_queue, done_queue):
     for reseni in iter(input_queue.get, 'STOP'):
         start_time = time.time() 
         #grabs host from queue
-        klic, _s = os.path.split(reseni)
-        times, elements, suma = read_transport(reseni, True)
-        fname = klic + '/' + FNAME_ELEMS
-        save_vysledek(fname, elements)
-        fname = klic + '/' + FNAME_TIME
-        save_vysledek(fname, times)
-        fname = klic + '/' + FNAME_SUMA
-        save_vysledek(fname, suma)
+        if substances:
+            work_on_multiple_substances(reseni)
+        else:    
+            work_on_single_substance(reseni)
         
         done_queue.put(time.time() - start_time)
 
         
-def read_transport(fname, suma=False):
+def read_transport(fname, suma=False, substances=False):
     """
     Read a Flow .pos file.
     @param: suma - set True if sum of concentration has to be computed too
@@ -57,7 +53,10 @@ def read_transport(fname, suma=False):
         print 'Error - failed to open file %s ' % fname
     else:
         #in result times, elements, elems_suma
-        result = parse_single_substances(data, suma)
+        if substances:
+            result = parse_multiple_substances(data, suma)
+        else:
+            result = parse_single_substances(data, suma)
         if suma:
             return result[0], result[1], result[2]
         else:
@@ -109,7 +108,7 @@ def parse_single_substances(data_lines, suma=False):
         return times, elements  
 
 
-def parse_multiple_substances(substances, data_lines, suma=False):
+def parse_multiple_substances(data_lines, suma=False):
     '''
     parses transport data for multiple substances task 
     at each simulation time there are @substances number of results
@@ -208,25 +207,32 @@ def create_ini_file_for_substance(ininame, substance):
         
     new_file_name = os.path.join(dir_name, file_name)
     shutil.copy2(ininame, new_file_name)
-    
-    print flow.change_paths_in_file(new_file_name, '..')    
+    flow.change_paths_in_file(new_file_name, '..')    
         
-    
-
-
-
-        
-def get_result_files(dirname):
+            
+def get_result_files(dirname, substances=False):
     '''
     Search dirname for solution files
     test if solution file exists
     '''
     res = []
-    for inif in parse_task_dirs(dirname):
-        dirname, finame = os.path.split(inif)
-        del(finame)
-        res.append(dirname + '/' + get_name_from_ini_file(inif))        
+    inifiles = parse_task_dirs(dirname)
+    for inif in inifiles:
+        dir_name, _fin = os.path.split(inif)
+        res.append(dir_name + '/' + get_name_from_ini_file(inif))        
+    if substances:
+        return zip(inifiles, res)
+    
     return res
+
+def read_process_substances(source, fformat='json'):
+    '''
+    Read solution data from task dirs, remove zeros
+    save non-zero concentration elements and times to pickle file
+    '''
+    for reseni in source:
+        work_on_multiple_substances(reseni)
+        
 
 def read_process_all(source, fformat='json'):
     '''
@@ -234,18 +240,48 @@ def read_process_all(source, fformat='json'):
     save non-zero concentration elements and times to pickle file
     '''
     for reseni in source:
-        klic, soubor = os.path.split(reseni)
-        del(soubor)
-        times, elements, suma = read_transport(reseni, True)
-        fname = klic + '/' + FNAME_ELEMS
-        save_vysledek(fname, elements, fformat)
+        work_on_single_substance(reseni)
+
+def work_on_multiple_substances(reseni):
+    '''
+    parse one transport file for data with multiple substances
+    '''
+    inifile = reseni[0]
+    posfile = reseni[1]
+    klic, _sou = os.path.split(posfile)
+    times, elements, suma = read_transport(posfile, True, True)
+    
+    for subst in elements.keys():
+        names = subst.split('_')
+        sub_name = names[0]
+        create_ini_file_for_substance(inifile, sub_name)
         
-        fname = klic + '/' + FNAME_SUMA
-        save_vysledek(fname, suma, fformat)
+        fname = os.path.join(klic, sub_name, FNAME_ELEMS)
+        save_vysledek(fname, elements[subst])
         
-        fname = klic  + '/' + FNAME_TIME
-        save_vysledek(fname, times, fformat)
-        print 'zpracovano %s' % klic
+        fname = os.path.join(klic, sub_name, FNAME_SUMA)
+        save_vysledek(fname, suma[subst])
+        
+        fname = os.path.join(klic, sub_name, FNAME_TIME)
+        save_vysledek(fname, times)
+        print 'zpracovano %s' % klic       
+        
+def work_on_single_substance(reseni):
+    '''
+    parse one transport file, for data with only one substance
+    '''
+    jmena = os.path.split(reseni)
+    klic = jmena[0]
+    times, elements, suma = read_transport(reseni, True)
+    fname = os.path.join(klic, FNAME_ELEMS)
+    save_vysledek(fname, elements)
+    
+    fname = os.path.join(klic, FNAME_SUMA)
+    save_vysledek(fname, suma)
+    
+    fname = os.path.join(klic, FNAME_TIME)
+    save_vysledek(fname, times)
+    return 'zpracovano %s' % klic        
         
 def save_vysledek(filename, vysledek, fformat = 'json'):
     '''
@@ -350,12 +386,12 @@ def __test_vysledek_load():
     print data['19506']
     
     
-def main_multiprocess(dirname):
+def main_multiprocess(dirname, substances=False):
     '''
     main loop for multiprocess run
     '''
     
-    rslts = get_result_files(dirname)
+    rslts = get_result_files(dirname, substances)
     nr_of_proc = cpu_count()
     
     # Create queues
@@ -368,7 +404,7 @@ def main_multiprocess(dirname):
     
     #Start worker processes
     for i in range(nr_of_proc):
-        Process(target=worker, args=(task_queue, done_queue)).start()
+        Process(target=worker, args=(task_queue, done_queue, substances)).start()
     
     # Get and print results
     sumtime = 0
@@ -391,15 +427,17 @@ def usage():
     '''
     print 'Tool for flow123d transport_out data compression.'
     print 'Recursively search given directory for files, and write output in json format'
-    print 'usage: transport -d dirname for single process'
+    print 'usage: transport -s dirname for single process, with single substance'
+    print 'usage: transport -u dirname for single process, with multiple substances'
     print 'usage: transport -m dirname for multiprocess (multicore CPU is a big advantage for this)'
+    print 'usage: transport -c dirname for multiprocess with multiple substances'
     
 def main():
     '''
     getopt main procedure
     '''
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "d:m:h", ["dir=", "multi=", "help"])
+        opts, args = getopt.getopt(sys.argv[1:], "s:m:h:u:c:", ["single=", "multi=", "help", "msubst=", "subpro="])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -412,11 +450,16 @@ def main():
         if opt in ("-h", "--help"):
             usage()
             sys.exit()
-        elif opt in ("-d", "--dir"):
+        elif opt in ("-s", "--single"):
             rslts = get_result_files(arg)
             read_process_all(rslts, 'json')
+        elif opt in ("-u", "--msubst"):
+            rslts = get_result_files(arg, True)
+            read_process_substances(rslts, 'json')    
         elif opt in ("-m", "--multi"):
-            main_multiprocess(arg)    
+            main_multiprocess(arg)
+        elif opt in ("-c", "--subpro"):
+            main_multiprocess(arg, True)          
         else:
             usage()
             sys.exit()
