@@ -453,15 +453,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.button_process_newonly.setVisible(True)
             self.button_process_all.setText('All')
 
-        msg = "Found {} tasks to analyze. That will take approx. {}\n".format(
-            n_tas, ruzne.format_time(n_tas * 4))
+        msg = "Found {} tasks to analyze. It may take a while\n".format(n_tas)
         msg += "{} tasks was already processed (compressed file found), {} still need processing\n".format(
             n_sols, n_tas - n_sols)
         if self.substances and n_sols > 0:
-            msg += "If computing with multiple substances you can now close this primary task and open result for single substance in subfolder."
+            msg += "\n\nYour task works with multiple substances. Now you close this primary task and open result for single substance in subfolder."
         self.label_processing_text.setText(msg)
 
         self.progress_processing.setMaximum(n_tas * 4)
+        
+    
 
     def _analyze_data(self):
         '''
@@ -505,7 +506,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         analyze transport out data
         uses transport_multi module for multiprocess computation
         '''
-        nr_of_proc = cpu_count()
+        nr_of_proc = cpu_count() - 1
         self.progress_processing.setMaximum(len(task_list) * 4)
         self.progress_processing.setVisible(True)
 
@@ -615,7 +616,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.result_times = None
 
         if msg:
-            self.messenger('{}. Please process data first'.format(msg))
+            if self.substances:
+                self.messenger("Your task works with multiple substances. Please open result for single substance in subfolder.")
+            else:    
+                self.messenger('{}. Please process data first'.format(msg))
             self.tabWidget.setCurrentWidget(self.data_processing)
             self.tabWidget.setCurrentIndex(2)  # 2 should be data processing
             return False

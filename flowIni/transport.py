@@ -172,7 +172,8 @@ def parse_multiple_substances(data_lines, suma=False):
 def parse_task_dirs(dirname, search_for='ini'):
     '''
     walk through dirname -r
-    find file of search_for type file'''
+    find file of search_for type file
+    '''
     inifiles = []
     for root, dirs, files in os.walk(dirname):
         for fname in files:
@@ -264,6 +265,13 @@ def work_on_multiple_substances(reseni):
         
         fname = os.path.join(klic, sub_name, FNAME_TIME)
         save_vysledek(fname, times)
+        
+        #multiple processing hack
+        fname = os.path.join(klic, FNAME_ELEMS+'.json')
+        with open(fname, 'w') as done_file:
+            done_file.write('{"_comment" : "data are saved in nested substances subdirectories",\n"completed" : "true"}')
+            
+        
         print 'zpracovano %s' % klic       
         
 def work_on_single_substance(reseni):
