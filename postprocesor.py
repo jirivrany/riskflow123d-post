@@ -683,12 +683,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.problem_type = 'compare'
         if self.find_and_open_inifile():
             self.box_merger.setHidden(True)
-            # self.tabWidget.removeTab(2)
-            #self.tabWidget.addTab(self.tab_3,'Sensitivity Analyser')
+            self.tabWidget.addTab(self.comparative_analyser, 'Sensitivity Analyser')
+            self.tabWidget.addTab(self.data_processing, 'Data Processing')
             self.label_analyser_title.setText('Sensitivity Analyser')
             self.init_mesh_tools()
             self.tabWidget.setCurrentIndex(2)
             self._save_setup()
+
+        self._analyser_dialog()  # check the data before display manualy
+        self._data_dialog()     
 
         self.tabWidget.show()
 
@@ -700,14 +703,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.problem_type = 'compare'
 
         if self.find_and_open_inifile():
-            # self.tabWidget.removeTab(2)
-            #self.tabWidget.addTab(self.tab_3,'Monte Carlo Analyser')
+            self.tabWidget.addTab(self.comparative_analyser, 'Monte Carlo Analyser')
+            self.tabWidget.addTab(self.data_processing, 'Data Processing')
             self.label_analyser_title.setText('Monte Carlo Analyser')
             self.init_mesh_tools()
 
             self.box_merger.setHidden(False)
             self.tabWidget.setCurrentIndex(2)
             self._save_setup()
+            
+        self._analyser_dialog()  # check the data before display manualy
+        self._data_dialog()    
 
         self.tabWidget.show()
 
