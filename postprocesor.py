@@ -555,7 +555,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             filtered_dict = self.result_elements
 
         for xkey, xval in filtered_dict.items():
-            print xkey, xval  # DEBUG
             self.draw_routine(xkey, xval, gdir)
 
         self.messenger('all charts sucessfully created')

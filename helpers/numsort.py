@@ -10,11 +10,11 @@ class NumberSortModel(QSortFilterProxyModel):
         compare method
         '''
         try:
-            lvalue = float(left.data())
-            rvalue = float(right.data())
+            lvalue = left.data().toFloat()
+            rvalue = right.data().toFloat()
         except TypeError:
-            print left.data(), right.data()
+            print "table data comparsion TypeError / failed convert to float"
         except ValueError:
-            print left.data(), right.data()
+            print "table data comparsion ValueError / failed convert to float"
         else:
             return lvalue < rvalue
