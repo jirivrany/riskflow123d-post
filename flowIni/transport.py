@@ -50,7 +50,8 @@ def read_transport(fname, suma=False, substances=False):
         with open(fname, "r") as mshfile:
             data = mshfile.readlines()
     except IOError:
-        print 'Error - failed to open file %s ' % fname
+        print 'Error - failed to open solution pos file %s ' % fname
+        return False
     else:
         #in result times, elements, elems_suma
         if substances:
@@ -280,16 +281,18 @@ def work_on_single_substance(reseni):
     '''
     jmena = os.path.split(reseni)
     klic = jmena[0]
-    times, elements, suma = read_transport(reseni, True)
-    fname = os.path.join(klic, FNAME_ELEMS)
-    save_vysledek(fname, elements)
-    
-    fname = os.path.join(klic, FNAME_SUMA)
-    save_vysledek(fname, suma)
-    
-    fname = os.path.join(klic, FNAME_TIME)
-    save_vysledek(fname, times)
-    return 'zpracovano %s' % klic        
+    result = read_transport(reseni, True)
+    if result:
+        times, elements, suma = result
+        fname = os.path.join(klic, FNAME_ELEMS)
+        save_vysledek(fname, elements)
+        
+        fname = os.path.join(klic, FNAME_SUMA)
+        save_vysledek(fname, suma)
+        
+        fname = os.path.join(klic, FNAME_TIME)
+        save_vysledek(fname, times)
+        return 'zpracovano %s' % klic        
         
 def save_vysledek(filename, vysledek, fformat = 'json'):
     '''

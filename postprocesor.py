@@ -436,6 +436,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         a dialog for data processing
         '''
+        
         self.progress_processing.setHidden(True)
         self.progress_processing.setMinimum(0)
         self.progress_processing.setValue(0)
@@ -766,7 +767,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             fname = self.master_work_dir + self.flowini_file_master
             self.file_dict = flow.get_dict_from_file(fname)
             subs = flow.get_substances_from_file(fname)
-            if subs['N_substances'] > 1:
+            if int(subs['N_substances']) > 1:
                 self.substances = True
 
             return True
