@@ -175,15 +175,20 @@ def parse_task_dirs(dirname, search_for='ini'):
     walk through dirname -r
     find file of search_for type file
     '''
-    inifiles = []
+    inifiles = set()
     for root, dirs, files in os.walk(dirname):
-        for fname in files:
-            if fname.lower().endswith(search_for):
-                inifiles.append('/'.join([root, fname]))
-            elif fname == search_for:
-                inifiles.append('/'.join([root, dirs, fname]))  
-                
+        #no subdirs means basic problem, we can search
+        #for monte and sentitivty we need only subdirs with tasks
+        if len(dirs) == 0 or root != dirname: 
+            for fname in files:
+                if fname.lower().endswith(search_for):
+                    inifiles.add('/'.join([root, fname]))
+                elif fname == search_for:
+                    inifiles.add('/'.join([root, dirs, fname]))  
+        
     return inifiles     
+
+
                        
 def get_name_from_ini_file(ininame):
     '''
@@ -221,7 +226,7 @@ def get_result_files(dirname, substances=False):
     inifiles = parse_task_dirs(dirname)
     for inif in inifiles:
         dir_name, _fin = os.path.split(inif)
-        res.append(dir_name + '/' + get_name_from_ini_file(inif))        
+        res.append(os.path.join(dir_name, get_name_from_ini_file(inif)))        
     if substances:
         return zip(inifiles, res)
     
@@ -251,29 +256,29 @@ def work_on_multiple_substances(reseni):
     inifile = reseni[0]
     posfile = reseni[1]
     klic, _sou = os.path.split(posfile)
-    times, elements, suma = read_transport(posfile, True, True)
-    
-    for subst in elements.keys():
-        names = subst.split('_')
-        sub_name = names[0]
-        create_ini_file_for_substance(inifile, sub_name)
+    result = read_transport(posfile, True, True)
+    if result:
+        times, elements, suma = result
         
-        fname = os.path.join(klic, sub_name, FNAME_ELEMS)
-        save_vysledek(fname, elements[subst])
-        
-        fname = os.path.join(klic, sub_name, FNAME_SUMA)
-        save_vysledek(fname, suma[subst])
-        
-        fname = os.path.join(klic, sub_name, FNAME_TIME)
-        save_vysledek(fname, times)
-        
-        #multiple processing hack
-        fname = os.path.join(klic, FNAME_ELEMS+'.json')
-        with open(fname, 'w') as done_file:
-            done_file.write('{"_comment" : "data are saved in nested substances subdirectories",\n"completed" : "true"}')
+        for subst in elements.keys():
+            names = subst.split('_')
+            sub_name = names[0]
+            create_ini_file_for_substance(inifile, sub_name)
             
-        
-        print 'zpracovano %s' % klic       
+            fname = os.path.join(klic, sub_name, FNAME_ELEMS)
+            save_vysledek(fname, elements[subst])
+            
+            fname = os.path.join(klic, sub_name, FNAME_SUMA)
+            save_vysledek(fname, suma[subst])
+            
+            fname = os.path.join(klic, sub_name, FNAME_TIME)
+            save_vysledek(fname, times)
+            
+            #multiple processing hack
+            fname = os.path.join(klic, FNAME_ELEMS+'.json')
+            with open(fname, 'w') as done_file:
+                done_file.write('{"_comment" : "data are saved in nested substances subdirectories",\n"completed" : "true"}')
+                
         
 def work_on_single_substance(reseni):
     '''
