@@ -320,14 +320,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         parses all dirs and sums concentrations for all/selected elements
         output a table with sum
         '''
+        
+        #substances
+        if self.substances:
+            sname = str(self.select_substance_compar.currentText())
+            filename = path.join(sname, FNAME_SUMA)
+        else:
+            sname = False
+            filename = FNAME_SUMA    
 
-        master = self.work_dir + '/' + 'master/' + FNAME_SUMA
+        master = path.join(self.work_dir, 'master', filename)
         mas_conc_suma = transport.load_vysledek(master)
         mas_total = concentrations.sum_conc(mas_conc_suma, elm_list)
 
+        
         list_of_conc = []
         task_numbers = []
-        conc = transport.parse_task_dirs(self.work_dir, FNAME_SUMA)
+        conc = transport.parse_task_dirs(self.work_dir, FNAME_SUMA, sname)
         for fname in conc:
             conc_suma = transport.load_vysledek(fname)
             task_nr = path.split(fname)[0]
@@ -768,8 +777,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             subs = flow.get_substances_from_file(fname)
             if int(subs['N_substances']) > 1:
                 self.substances = True
+                self.setup_substances_form(subs)
+            else:
+                #hide the group box for substances in comparative analyser
+                self.group_compar_subst.setHidden(True)    
 
             return True
+        
+    def setup_substances_form(self, subs):
+        '''
+        fill qcombobox in comparative form with names of substances
+        '''    
+        names = subs['Substances'].split()
+        self.select_substance_compar.clear()
+        self.select_substance_compar.insertItems(0, names)
+        self.select_substance_compar.repaint()
+
 
     def _load_setup(self):
         '''load setup, create a new file if not exists'''

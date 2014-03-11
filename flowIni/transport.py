@@ -170,7 +170,17 @@ def parse_multiple_substances(data_lines, suma=False):
         return times, all_subs  
    
 
-def parse_task_dirs(dirname, search_for='ini'):
+def parse_task_dirs(dirname, search_for='ini', substance_name=False):
+    '''
+    dispatcher for parsing function
+    '''
+    if substance_name:
+        return _parse_for_substances(dirname, search_for, substance_name)
+    else:
+        return _parse_for_simple(dirname, search_for)
+    
+
+def _parse_for_simple(dirname, search_for):
     '''
     walk through dirname -r
     find file of search_for type file
@@ -182,13 +192,36 @@ def parse_task_dirs(dirname, search_for='ini'):
         if len(dirs) == 0 or root != dirname: 
             for fname in files:
                 if fname.lower().endswith(search_for):
-                    inifiles.add('/'.join([root, fname]))
+                    found = os.path.join(root, fname)
+                    inifiles.add(found)
                 elif fname == search_for:
-                    inifiles.add('/'.join([root, dirs, fname]))  
+                    found = os.path.join(root, dirs, fname)
+                    inifiles.add(found)  
         
     return inifiles     
 
-
+def _parse_for_substances(dirname, search_for, substance_name):
+    '''
+    walk through dirname -r
+    find file of search_for type file
+    and look only to substances dir
+    '''
+    inifiles = set()
+    for root, dirs, files in os.walk(dirname):
+        #no subdirs means basic problem, we can search
+        #for monte and sentitivty we need only subdirs with tasks
+        if len(dirs) == 0 or root != dirname: 
+            for fname in files:
+                if fname.lower().endswith(search_for):
+                    found = os.path.join(root, fname)
+                    if '/{}/'.format(substance_name) in found:
+                        inifiles.add(found)
+                elif fname == search_for:
+                    found = os.path.join(root, dirs, fname)
+                    if '/{}/'.format(substance_name) in found:
+                        inifiles.add(found)  
+        
+    return inifiles     
                        
 def get_name_from_ini_file(ininame):
     '''

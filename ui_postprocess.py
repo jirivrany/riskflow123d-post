@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'postprocesing.ui'
 #
-# Created: Fri Jan 10 12:37:01 2014
+# Created: Tue Mar 11 09:34:28 2014
 #      by: PyQt4 UI code generator 4.10.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(896, 1040)
+        MainWindow.resize(896, 903)
         self.centralWidget = QtGui.QWidget(MainWindow)
         self.centralWidget.setObjectName(_fromUtf8("centralWidget"))
         self.verticalLayout_7 = QtGui.QVBoxLayout(self.centralWidget)
@@ -318,9 +318,17 @@ class Ui_MainWindow(object):
         self.check_compare_sum.setObjectName(_fromUtf8("check_compare_sum"))
         self.formLayout.setWidget(3, QtGui.QFormLayout.LabelRole, self.check_compare_sum)
         self.horizontalLayout_7.addWidget(self.box_sensitivity)
+        self.group_compar_subst = QtGui.QGroupBox(self.frame)
+        self.group_compar_subst.setObjectName(_fromUtf8("group_compar_subst"))
+        self.verticalLayout_9 = QtGui.QVBoxLayout(self.group_compar_subst)
+        self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
+        self.select_substance_compar = QtGui.QComboBox(self.group_compar_subst)
+        self.select_substance_compar.setObjectName(_fromUtf8("select_substance_compar"))
+        self.verticalLayout_9.addWidget(self.select_substance_compar)
+        spacerItem8 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_9.addItem(spacerItem8)
+        self.horizontalLayout_7.addWidget(self.group_compar_subst)
         self.frame_4 = QtGui.QFrame(self.frame)
-        self.frame_4.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.frame_4.setFrameShadow(QtGui.QFrame.Raised)
         self.frame_4.setObjectName(_fromUtf8("frame_4"))
         self.verticalLayout_5 = QtGui.QVBoxLayout(self.frame_4)
         self.verticalLayout_5.setObjectName(_fromUtf8("verticalLayout_5"))
@@ -336,8 +344,8 @@ class Ui_MainWindow(object):
         self.button_grade_filter = QtGui.QPushButton(self.frame_4)
         self.button_grade_filter.setObjectName(_fromUtf8("button_grade_filter"))
         self.verticalLayout_5.addWidget(self.button_grade_filter)
-        spacerItem8 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem8)
+        spacerItem9 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_5.addItem(spacerItem9)
         self.horizontalLayout_7.addWidget(self.frame_4)
         self.box_merger = QtGui.QGroupBox(self.frame)
         self.box_merger.setObjectName(_fromUtf8("box_merger"))
@@ -352,11 +360,11 @@ class Ui_MainWindow(object):
         self.edit_merge_minval = QtGui.QLineEdit(self.box_merger)
         self.edit_merge_minval.setObjectName(_fromUtf8("edit_merge_minval"))
         self.verticalLayout_6.addWidget(self.edit_merge_minval)
-        spacerItem9 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_6.addItem(spacerItem9)
+        spacerItem10 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_6.addItem(spacerItem10)
         self.horizontalLayout_7.addWidget(self.box_merger)
-        spacerItem10 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem10)
+        spacerItem11 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem11)
         self.gridLayout_10.addWidget(self.frame, 5, 0, 1, 1)
         self.table_comp_rslt = QtGui.QTableView(self.comparative_analyser)
         self.table_comp_rslt.setObjectName(_fromUtf8("table_comp_rslt"))
@@ -387,20 +395,20 @@ class Ui_MainWindow(object):
         self.button_process_newonly.setMaximumSize(QtCore.QSize(1666666, 1666666))
         self.button_process_newonly.setObjectName(_fromUtf8("button_process_newonly"))
         self.horizontalLayout_6.addWidget(self.button_process_newonly)
-        spacerItem11 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem11)
+        spacerItem12 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_6.addItem(spacerItem12)
         self.verticalLayout_3.addWidget(self.frame_2)
         self.progress_processing = QtGui.QProgressBar(self.groupBox_71)
         self.progress_processing.setProperty("value", 24)
         self.progress_processing.setObjectName(_fromUtf8("progress_processing"))
         self.verticalLayout_3.addWidget(self.progress_processing)
         self.verticalLayout_2.addWidget(self.groupBox_71)
-        spacerItem12 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_2.addItem(spacerItem12)
+        spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem13)
         self.tabWidget.addTab(self.data_processing, _fromUtf8(""))
         self.verticalLayout_7.addWidget(self.tabWidget)
-        spacerItem13 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_7.addItem(spacerItem13)
+        spacerItem14 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        self.verticalLayout_7.addItem(spacerItem14)
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtGui.QMenuBar(MainWindow)
         self.menuBar.setGeometry(QtCore.QRect(0, 0, 896, 27))
@@ -456,7 +464,7 @@ class Ui_MainWindow(object):
         self.menuBar.addAction(self.menuTools.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -546,6 +554,7 @@ class Ui_MainWindow(object):
         self.radio_compare_surface.setText(_translate("MainWindow", "Surface", None))
         self.radio_compare_selected.setText(_translate("MainWindow", "Selected ", None))
         self.check_compare_sum.setText(_translate("MainWindow", "Sum of Concentrations", None))
+        self.group_compar_subst.setTitle(_translate("MainWindow", "Substance", None))
         self.button_compare.setText(_translate("MainWindow", "Start comparsion", None))
         self.button_export_csv.setText(_translate("MainWindow", "Export to CSV", None))
         self.button_grade_filter.setText(_translate("MainWindow", "Filter grade", None))
