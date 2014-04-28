@@ -5,19 +5,24 @@ Created on 18.1.2012
 '''
 
 from grafLinear import fill_up_zeros
+from os import path
 
-SINGLE_NAME = '/concentrations.csv'
-COMP_NAME = '/conc_comparsion.csv'
+SINGLE_NAME = 'concentrations.csv'
+COMP_NAME = 'conc_comparsion.csv'
 
-def write_comparsion_tab(table_rows, whereto):
+def write_comparsion_tab(table_rows, whereto, substance_name=None):
     '''
     writes comparsion table to csv
     @param table_rows: (element_id,suma,grade)
     @param whereto: output dir 
     '''
-    
-    out_file = open(whereto+COMP_NAME,'w')
+    if substance_name:
+        cname = COMP_NAME[:-4] + '_' + substance_name + '.csv'
+        filename = path.join(whereto, cname)
+    else:
+        filename = path.join(whereto, COMP_NAME)
 
+    out_file = open(filename,'w')
     print >> out_file,'element;sum;grade'
     for element, suma, grade in table_rows:
         print >> out_file, '{};{};{}'.format(element, suma, grade)
@@ -33,7 +38,7 @@ def write_single_conc_tab(data, times, whereto):
     @param whereto: output dir 
     '''
     
-    out_file = open(whereto+SINGLE_NAME, 'w')
+    out_file = open(path.join(whereto, SINGLE_NAME), 'w')
 
     print >> out_file, 'elem./time;'+';'.join(map(str, times))
     for xkey, xval in data.items():

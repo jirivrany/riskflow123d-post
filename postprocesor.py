@@ -260,7 +260,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.messenger('export error - data not exists')
             return False
 
-        csvexport.write_comparsion_tab(self.comparation_table, self.work_dir)
+        sname = None
+        #selected substance 
+        if self.substances:
+            sname = str(self.select_substance_compar.currentText())
+            
+        csvexport.write_comparsion_tab(self.comparation_table, self.work_dir, sname)
         self.messenger('Table has been successfully exported to CSV file')
         self.button_export_csv.setDisabled(True)
 
