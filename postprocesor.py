@@ -290,9 +290,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         parses all task dirs, opens result json files and merge values to one big table
         discards results in master dir
         '''
-        merged_table = {}
-        conc = transport.parse_task_dirs(self.work_dir, FNAME_ELEMS)
+        sname, filename = self.__get_proper_filename_suma()  
+        conc = transport.parse_task_dirs(self.work_dir, FNAME_ELEMS, sname)
 
+        
+        merged_table = {}
+        
         minval = self.edit_merge_minval.text()
 
         try:
@@ -318,6 +321,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             merged_table, master_conc, output_file, len(conc) - 1, minval)
         self.messenger(
             'Data has been successfully merged and exported to CSV file')
+        
+        
+    def __get_proper_filename_suma(self):
+        '''
+        get proper filename for SUM concetration 
+        depends if substances are present or not
+        '''
+        if self.substances:
+            sname = str(self.select_substance_compar.currentText())
+            filename = path.join(sname, FNAME_SUMA)
+        else:
+            sname = False
+            filename = FNAME_SUMA 
+            
+        return sname, filename        
 
     def __compare_selected_conc(self, elm_list=None):
         '''
@@ -326,13 +344,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         output a table with sum
         '''
         
-        #substances
-        if self.substances:
-            sname = str(self.select_substance_compar.currentText())
-            filename = path.join(sname, FNAME_SUMA)
-        else:
-            sname = False
-            filename = FNAME_SUMA    
+        sname, filename = self.__get_proper_filename_suma()  
 
         master = path.join(self.work_dir, 'master', filename)
         mas_conc_suma = transport.load_vysledek(master)
