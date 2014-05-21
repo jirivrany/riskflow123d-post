@@ -212,13 +212,14 @@ def _parse_for_substances(dirname, search_for, substance_name):
         #for monte and sentitivty we need only subdirs with tasks
         if len(dirs) == 0 or root != dirname: 
             for fname in files:
+                nstr = '{0}{1}{0}'.format(os.sep, substance_name)
                 if fname.lower().endswith(search_for):
                     found = os.path.join(root, fname)
-                    if '/{}/'.format(substance_name) in found:
+                    if nstr in found:
                         inifiles.add(found)
                 elif fname == search_for:
                     found = os.path.join(root, dirs, fname)
-                    if '/{}/'.format(substance_name) in found:
+                    if nstr in found:
                         inifiles.add(found)  
         
     return inifiles     
