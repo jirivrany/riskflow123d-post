@@ -4,9 +4,10 @@ Created on 9.10.2012
 @author: albert
 '''
 import os.path
+import os.sep
 import sys.platform
 
-SEPARATOR = '/'
+SEPAR = os.sep
 
 SUBMIT_ALL = 'submit_all.sh'
 COMPRESS = 'compress.sh'
@@ -29,11 +30,11 @@ def create_cluster_launcher(inifile, launcher = None):
         launcher = DEFAULT_LAUNCHER
     
     adr, inifname  = os.path.split(inifile)
-    file_name = adr + SEPARATOR + CLUSTER
+    file_name = adr + SEPAR + CLUSTER
     launcher_file = open(file_name, 'w')
     print >> launcher_file, '#!/bin/bash'
     print >> launcher_file, '#$ -cwd'
-    print >> launcher_file, '#$ -j y'
+    print >> launcher_file, '#$ -j y''
     print >> launcher_file, '#$ -S /bin/bash'
     print >> launcher_file, '{} -S {}'.format(launcher, inifname)
     launcher_file.close()
@@ -44,9 +45,9 @@ def create_local_launcher(inifile, flow_exec):
     adr, inifname = os.path.split(inifile)
     
     if sys.platform.find('win') > -1:
-        file_name = adr + SEPARATOR + 'run.bat'
+        file_name = adr + SEPAR + 'run.bat'
     else:
-        file_name = adr + SEPARATOR + 'run.sh'    
+        file_name = adr + SEPAR + 'run.sh'    
     
     launcher_file = open(file_name, 'w')
     print >> launcher_file, '{} -S {}'.format(flow_exec, inifname)
@@ -54,7 +55,7 @@ def create_local_launcher(inifile, flow_exec):
 
 def create_cluster_submit_all(adr):
     '''creates submit all batch'''
-    file_name = adr + SEPARATOR + SUBMIT_ALL
+    file_name = adr + SEPAR + SUBMIT_ALL
     batch_file = open(file_name, 'w')
     print >> batch_file, cluster_launcher_batch('cluster.sh')
     batch_file.close()    
@@ -63,7 +64,7 @@ def create_cluster_compress(adr):
     '''
     creates compress shell file
     '''
-    file_name = adr + SEPARATOR + COMPRESS
+    file_name = adr + SEPAR + COMPRESS
     compress_file = open(file_name, 'w')
     print >> compress_file, cluster_compress()
     compress_file.close()
@@ -72,7 +73,7 @@ def create_cluster_clean(adr):
     '''
     creates cleanup shell file
     '''
-    file_name = adr + SEPARATOR + CLEAN_LOGS
+    file_name = adr + SEPAR + CLEAN_LOGS
     cluster_clean = open(file_name, 'w')
     print >> cluster_clean, cluster_cleanup()
     cluster_clean.close()     

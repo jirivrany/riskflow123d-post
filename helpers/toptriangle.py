@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-Modul s odevzdanym ukolem
+Searching for largest triangle created by 4 given points
 '''
 
 

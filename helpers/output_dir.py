@@ -7,7 +7,7 @@ import os
 from genericpath import exists
 
 DIRNAME = {'Monte Carlo' : 'MonteCarlo', 'Sensitivity Task' : 'Sensitivity', 'Basic Problem' : 'basicProblem'}
-SEPARATOR = '/'
+SEPARATOR = os.sep
 
         
 def set_output_dir(start_dir, method):

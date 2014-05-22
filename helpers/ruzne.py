@@ -4,6 +4,7 @@ Created on 16.11.2011
 @author: albert
 '''
 import os.path
+import os.sep
 
 def value_set(dic, key):
     '''
@@ -39,7 +40,7 @@ def format_time(given_time):
 
 def isit_task_folder(dirname):
     '''Test if provided dirname contains master folder'''
-    return os.path.isfile(dirname + '/problem.type')
+    return os.path.isfile(dirname + os.sep + 'problem.type')
 
 
 def text2floatmp(text):
