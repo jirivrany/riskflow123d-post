@@ -7,7 +7,10 @@ __author__ = "Jiri Vrany"
 __date__  = "$23.10.2012$"
 
 
-from iniparse import INIConfig 
+from iniparse import INIConfig
+from os import sep
+
+SEPAR = sep 
 
 EXTENSIONS_DICT = {
                     'Input':{ 'Mesh':'msh',
@@ -37,7 +40,7 @@ def change_paths_in_file(file_name, new_dir_name):
         current_config = INIConfig(confile) 
         for dic_key in EXTENSIONS_DICT.keys():
             for iner_key in EXTENSIONS_DICT[dic_key].keys():
-                current_config[dic_key][iner_key] = new_dir_name + '/' + current_config[dic_key][iner_key]
+                current_config[dic_key][iner_key] = new_dir_name + SEPAR + current_config[dic_key][iner_key]
     
     with open(file_name, 'w') as confile:
         print >> confile, current_config

@@ -18,7 +18,7 @@ from flowIni import flow, material, mesh, transport, surface
 from genericpath import exists
 from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger, mapcon, mapcanvas, numsort
 from ui_postprocess import Ui_MainWindow
-from os import mkdir, listdir, path
+from os import mkdir, listdir, path, sep
 
 
 __version__ = '0.0.2'
@@ -26,7 +26,7 @@ __appname__ = 'RiskFlow123D-post'
 __inifile__ = './riskflow123d-post.ini'
 
 
-SEPAR = '/'
+SEPAR = sep
 METHODS = ('Basic Problem', 'Monte Carlo', 'Sensitivity Task')
 IDSDICT = {'basicProblem': 'analyse_basic_problem', 'MonteCarlo':
            'analyse_monte_carlo', 'Sensitivity': 'analyse_sensitivity_task'}
@@ -115,7 +115,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         map_options = {
             "map_format": "png",
-            "map_file": "{}/mapa.png".format(self.work_dir),
+            "map_file": "{}{}mapa.png".format(self.work_dir, SEPAR),
             'xlabel': u'{}'.format(self.edit_chart_x_text.text()),
             'ylabel': u'{}'.format(self.edit_chart_y_text.text()),
             'title': u'{}'.format(self.edit_chart_title_text.text())
@@ -201,7 +201,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.button_exit.clicked.connect(self.close)
         self.button_draw_charts.clicked.connect(self.draw_charts)
         self.button_save_tables.clicked.connect(self.create_tables)
-        self.button_quick_test.clicked.connect(self.load_test)
 
         self.button_merge.clicked.connect(self.merge_result_files)
         self.box_merger.setHidden(True)
@@ -245,12 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.mesh_element_id_edit.setValidator(integer_validator)
         self.edit_mesh_crd.setValidator(integer_validator)
 
-    def load_test(self):
-        '''function for quick test'''
-        if len(self.work_dir) <= 2:
-            self.work_dir = '../data/test_melechov/MonteCarlo/02'
-        self.identify_problem_type()
-
+    
     def export_compare_conc(self):
         '''
         method for export comparsion table to csv file
@@ -280,7 +274,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.__compare_selected_conc(self.displayed_mesh_list.keys())
         elif self.radio_compare_surface.isChecked():
             if not self.surface_elements:
-                fname = self.work_dir + '/' + 'master/' + FNAME_SURF
+                fname = self.work_dir + 'SEPAR' + 'master' + SEPAR + FNAME_SURF
                 self.surface_elements = surface.read_result(fname)
             self.__compare_selected_conc(self.surface_elements)
 
@@ -570,7 +564,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.messenger('Data loaded sucessfully, starting drawing the charts')
 
-        gdir = self.work_dir + '/charts/'
+        gdir = self.work_dir + SEPAR + 'charts' + SEPAR
         if not exists(gdir):
             mkdir(gdir)
 
@@ -681,7 +675,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         action for basic analyser
         '''
 
-        self.master_work_dir = self.work_dir + '/'
+        self.master_work_dir = self.work_dir + SEPAR
         self.problem_type = 'basic'
         if self.find_and_open_inifile():
             self.box_merger.setHidden(True)
@@ -705,7 +699,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         action for sensitivity analyser
         '''
-        self.master_work_dir = self.work_dir + '/master/'
+        self.master_work_dir = self.work_dir + SEPAR + 'master' + SEPAR
         self.problem_type = 'compare'
         if self.find_and_open_inifile():
             self.box_merger.setHidden(True)
@@ -725,7 +719,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         action for monte carlo analyser
         '''
-        self.master_work_dir = self.work_dir + '/master/'
+        self.master_work_dir = self.work_dir + SEPAR + 'master' + SEPAR
         self.problem_type = 'compare'
 
         if self.find_and_open_inifile():
@@ -762,7 +756,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         fail if file not exist
         '''
         try:
-            rfile = open(self.work_dir + '/problem.type')
+            rfile = open(self.work_dir + SEPAR + 'problem.type')
         except IOError:
             self.messenger('Failed to open problem.type file')
             self.analyse_basic_problem()
@@ -848,7 +842,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
         wdir = {'basic': self.work_dir, 'compare': self.master_work_dir}
 
-        fname_bcd = wdir[self.problem_type] + '/' + self.file_dict['Boundary']
+        fname_bcd = wdir[self.problem_type] + SEPAR + self.file_dict['Boundary']
         self.bcd_file = fname_bcd
 
         if file_name is None:
@@ -858,7 +852,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if path.isfile(fname):
             self.surface_elements = surface.read_result(fname)
         else:
-            fname_msh = wdir[self.problem_type] + '/' + self.file_dict['Mesh']
+            fname_msh = wdir[self.problem_type] + SEPAR + self.file_dict['Mesh']
             self.surface_elements = surface.read(fname_bcd, fname_msh)
             surface.write(fname, self.surface_elements)
 
@@ -879,7 +873,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _load_mtr(self, file_name=None):
         '''load mtr from file, if not given look to the flow.ini settings'''
         if file_name == None:
-            file_name = self.master_work_dir + '/' + self.file_dict['Material']
+            file_name = self.master_work_dir + SEPAR + self.file_dict['Material']
 
         self.messenger('Loading materials from MTR file')
         self.material = material.Material()
@@ -961,7 +955,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         '''
 
         if not self.surface_elements:
-            fname = self.work_dir + '/' + 'master/' + FNAME_SURF
+            fname = self.work_dir + SEPAR + 'master' + SEPAR + FNAME_SURF
             self.surface_elements = surface.read_result(fname)
 
         vals = {}
