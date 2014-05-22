@@ -18,7 +18,8 @@ from flowIni import flow, material, mesh, transport, surface
 from genericpath import exists
 from helpers import logger, grafLinear, csvexport, ruzne, concentrations, merger, mapcon, mapcanvas, numsort
 from ui_postprocess import Ui_MainWindow
-from os import mkdir, listdir, path, sep
+from os import mkdir, listdir, path
+import os
 
 
 __version__ = '0.0.2'
@@ -26,7 +27,7 @@ __appname__ = 'RiskFlow123D-post'
 __inifile__ = './riskflow123d-post.ini'
 
 
-SEPAR = sep
+SEPAR = os.sep
 METHODS = ('Basic Problem', 'Monte Carlo', 'Sensitivity Task')
 IDSDICT = {'basicProblem': 'analyse_basic_problem', 'MonteCarlo':
            'analyse_monte_carlo', 'Sensitivity': 'analyse_sensitivity_task'}

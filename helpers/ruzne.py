@@ -3,8 +3,7 @@ Created on 16.11.2011
 
 @author: albert
 '''
-import os.path
-import os.sep
+import os
 
 def value_set(dic, key):
     '''
